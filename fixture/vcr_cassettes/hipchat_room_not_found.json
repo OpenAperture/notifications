@@ -1,0 +1,29 @@
+[
+  {
+    "request": {
+      "body": "",
+      "headers": [],
+      "method": "get",
+      "options": {
+        "connect_timeout": 5000
+      },
+      "url": "https://api.hipchat.com/v2/room/123abc?auth_token=myauthtoken"
+    },
+    "response": {
+      "body": "{\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"Room not found\",\n    \"type\": \"Not Found\"\n  }\n}",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+        "Date": "Tue, 13 Jan 2015 11:44:49 GMT",
+        "Server": "nginx",
+        "X-Ratelimit-Limit": "100",
+        "X-Ratelimit-Remaining": "92",
+        "X-Ratelimit-Reset": "1421149500.0",
+        "Content-Length": "94",
+        "Connection": "keep-alive"
+      },
+      "status_code": ["HTTP/1.1", 404, "Not Found"],
+      "type": "ok"
+    }
+  }
+]

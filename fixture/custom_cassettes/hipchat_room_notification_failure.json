@@ -1,0 +1,31 @@
+[
+  {
+    "request": {
+      "body": "",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "method": "post",
+      "options": {
+        "connect_timeout": 5000
+      },
+      "url": "https://api.hipchat.com/v2/room/12345/notification"
+    },
+    "response": {
+      "body": "",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+        "Date": "Tue, 11 Nov 2014 16:20:21 GMT",
+        "Server": "nginx",
+        "X-Ratelimit-Limit": "100",
+        "X-Ratelimit-Remaining": "100",
+        "X-Ratelimit-Reset": "1415722860.0",
+        "Content-Length": "186",
+        "Connection": "keep-alive"
+      },
+      "status_code": ["HTTP/1.1", 400, "Bad Request"],
+      "type": "error"
+    }
+  }
+]
