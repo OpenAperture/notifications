@@ -43,7 +43,7 @@ defmodule CloudOS.Notifications.Mixfile do
   defp deps do
     [
       {:json, "~> 0.3.2"},
-      {:cloudos_messaging, git: "git@github.com:UmbrellaCorporation-SecretProjectLab/cloudos_messaging.git", ref: "master"},
+      {:cloudos_messaging, git: "git@github.com:UmbrellaCorporation-SecretProjectLab/cloudos_messaging.git", ref: "890cd14c0d1e806595ab69bfc56bc9f9ea88a039"},
       {:timex_extensions, git: "git@github.com:UmbrellaCorporation-SecretProjectLab/timex_extensions.git", ref: "master"},
 
       #test dependencies

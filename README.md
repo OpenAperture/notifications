@@ -58,11 +58,36 @@ The following configuration values must be defined either as environment variabl
 	* Description:  The virtual host for the AMQP connection
   * Environment Variable:  MESSAGING_VIRTUAL_HOST
   * Environment Configuration (<env>.exs):  :cloudos_messaging, :virtual_host
+* Failover AMQP Username
+  * Type:  String
+  * Description:  The username for the failover AMQP connection
+  * Environment Variable:  FAILOVER_MESSAGING_USERNAME
+  * Environment Configuration (<env>.exs):  :cloudos_messaging, :failover_username
+* Failover AMQP Password
+  * Type:  String
+  * Description:  The password for the failover AMQP connection
+  * Environment Variable:  FAILOVER_MESSAGING_PASSWORD
+  * Environment Configuration (<env>.exs):  :cloudos_messaging, :failover_password
+* Failover AMQP Host
+  * Type:  String
+  * Description:  The host for the failover AMQP connection
+  * Environment Variable:  FAILOVER_MESSAGING_HOST
+  * Environment Configuration (<env>.exs):  :cloudos_messaging, :failover_host
+* Failover AMQP Virtual Host
+  * Type:  String
+  * Description:  The virtual host for the failover AMQP connection
+  * Environment Variable:  FAILOVER_MESSAGING_VIRTUAL_HOST
+  * Environment Configuration (<env>.exs):  :cloudos_messaging, :failover_virtual_host
 * AMQP Exchange
 	* Type:  String
 	* Description:  The exchange for the AMQP connection
   * Environment Variable:  MESSAGING_EXCHANGE
   * Environment Configuration (<env>.exs):  :cloudos_messaging, :exchange
+* Failover AMQP Exchange
+  * Type:  String
+  * Description:  The failover exchange for the failover AMQP connection
+  * Environment Variable:  FAILOVER_MESSAGING_EXCHANGE
+  * Environment Configuration (<env>.exs):  :cloudos_messaging, :failover_exchange
 * HipChat Authentication Tokens
 	* Type:  Comma delimited string (no spaces)
 	* Description:  A comma delimited string of [HipChat authentication tokens](https://www.hipchat.com/docs/apiv2/auth), used for publishing messages to HipChat.

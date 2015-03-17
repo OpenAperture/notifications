@@ -69,12 +69,16 @@ defmodule CloudOS.Notifications.Dispatcher do
       username: Configuration.get_messaging_config("MESSAGING_USERNAME", :username),
       password: Configuration.get_messaging_config("MESSAGING_PASSWORD", :password),
       virtual_host: Configuration.get_messaging_config("MESSAGING_VIRTUAL_HOST", :virtual_host),
-      host: Configuration.get_messaging_config("MESSAGING_HOST", :host)
+      host: Configuration.get_messaging_config("MESSAGING_HOST", :host),
+      failover_username: Configuration.get_messaging_config("FAILOVER_MESSAGING_USERNAME", :failover_username),
+      failover_password: Configuration.get_messaging_config("FAILOVER_MESSAGING_PASSWORD", :failover_password),
+      failover_virtual_host: Configuration.get_messaging_config("FAILOVER_MESSAGING_VIRTUAL_HOST", :failover_virtual_host),
+      failover_host: Configuration.get_messaging_config("FAILOVER_MESSAGING_HOST", :failover_host)
     }
 
     hipchat_queue = %Queue{
       name: "notifications_hipchat", 
-      exchange: %AMQPExchange{name: Configuration.get_messaging_config("MESSAGING_EXCHANGE", :exchange), options: [:durable]},
+      exchange: %AMQPExchange{name: Configuration.get_messaging_config("MESSAGING_EXCHANGE", :exchange), failover_name: Configuration.get_messaging_config("FAILOVER_MESSAGING_EXCHANGE", :failover_exchange), options: [:durable]},
       error_queue: "notifications_error",
       options: [durable: true, arguments: [{"x-dead-letter-exchange", :longstr, ""},{"x-dead-letter-routing-key", :longstr, "notifications_error"}]],
       binding_options: [routing_key: "notifications_hipchat"]
