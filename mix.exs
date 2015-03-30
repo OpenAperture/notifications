@@ -47,7 +47,7 @@ defmodule CloudOS.Notifications.Mixfile do
       {:timex_extensions, git: "https://#{System.get_env("GITHUB_OAUTH_TOKEN")}:x-oauth-basic@github.com/UmbrellaCorporation-SecretProjectLab/timex_extensions.git", ref: "master"},
 
       #test dependencies
-      {:exvcr, github: "parroty/exvcr", ref: "b418f02b3515e72185dc74d76741dc67787f539e", optional: true},
+      {:exvcr, github: "parroty/exvcr", optional: true},
       {:meck, "0.8.2"}      
     ]
   end
