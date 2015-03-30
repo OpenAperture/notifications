@@ -9,7 +9,7 @@
       "options": {
         "connect_timeout": 5000
       },
-      "url": "https://api.hipchat.com/v2/room/12345/notification"
+      "url": "https://api.hipchat.com/v2/room/12345/notification?auth_token=123abc"
     },
     "response": {
       "body": "",

@@ -43,12 +43,12 @@ defmodule CloudOS.Notifications.Mixfile do
   defp deps do
     [
       {:json, "~> 0.3.2"},
-      {:cloudos_messaging, git: "https://#{System.get_env("GITHUB_OAUTH_TOKEN")}:x-oauth-basic@github.com/UmbrellaCorporation-SecretProjectLab/cloudos_messaging.git", ref: "2db6e25c6e596889f34ee9254c0198c98a180611"},
-      {:timex_extensions, git: "https://#{System.get_env("GITHUB_OAUTH_TOKEN")}:x-oauth-basic@github.com/UmbrellaCorporation-SecretProjectLab/timex_extensions.git", ref: "master"},
+      {:cloudos_messaging, git: "https://#{System.get_env("GITHUB_OAUTH_TOKEN")}:x-oauth-basic@github.com/UmbrellaCorporation-SecretProjectLab/cloudos_messaging.git", ref: "2db6e25c6e596889f34ee9254c0198c98a180611", override: true},
+      {:timex_extensions, git: "https://#{System.get_env("GITHUB_OAUTH_TOKEN")}:x-oauth-basic@github.com/UmbrellaCorporation-SecretProjectLab/timex_extensions.git", ref: "7cf7cea363155eb753415a2f2c4f7a81db520c53", override: true},
 
       #test dependencies
-      {:exvcr, github: "parroty/exvcr", optional: true},
-      {:meck, "0.8.2"}      
+      {:exvcr, github: "parroty/exvcr", override: true, only: :test},
+      {:meck, "0.8.2", only: :test}      
     ]
   end
 end

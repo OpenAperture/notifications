@@ -14,6 +14,7 @@ defmodule CloudOS.Notifications.DispatcherTests do
   alias CloudOS.Messaging.AMQP.ConnectionPool
   alias CloudOS.Messaging.AMQP.ConnectionPools
   alias CloudOS.Messaging.AMQP.Exchange, as: AMQPExchange
+  alias CloudOS.Messaging.AMQP.SubscriptionHandler
   
 	setup_all do
     Room.start_link
@@ -55,6 +56,8 @@ defmodule CloudOS.Notifications.DispatcherTests do
   # register_queues tests
 
   test "dispatch_hipchat_notification" do
+    :meck.new(SubscriptionHandler, [:passthrough])
+    :meck.expect(SubscriptionHandler, :acknowledge, fn _, _ -> :ok end)
     :meck.new(Room, [:passthrough])
     :meck.expect(Room, :resolve_room_ids, fn names -> [123] end)
 
@@ -88,9 +91,10 @@ defmodule CloudOS.Notifications.DispatcherTests do
       message: message,
       is_success: true
     }
-    assert Dispatcher.dispatch_hipchat_notification(payload) == :ok
+    Dispatcher.dispatch_hipchat_notification(payload, %{subscription_handler: %{}, delivery_tag: "123abc"})
   after
     :meck.unload(Room)
     :meck.unload(HipchatPublisher)
+    :meck.unload(SubscriptionHandler)
   end
 end

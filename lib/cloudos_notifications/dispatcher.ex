@@ -11,13 +11,13 @@ defmodule CloudOS.Notifications.Dispatcher do
 	alias CloudOS.Messaging.AMQP.ConnectionOptions, as: AMQPConnectionOptions
 	alias CloudOS.Messaging.AMQP.Exchange, as: AMQPExchange
 	alias CloudOS.Messaging.Queue
+  alias CloudOS.Messaging.AMQP.SubscriptionHandler
 
 	alias CloudOS.Notifications.Hipchat.RoomNotification
   alias CloudOS.Notifications.Hipchat.Room
 	alias CloudOS.Notifications.Hipchat.Publisher, as: HipchatPublisher
 
   alias CloudOS.Notifications.Configuration
-
   @moduledoc """
   This module contains the logic to dispatch notification messsages to the appropriate GenServer(s) 
   """  
@@ -84,53 +84,69 @@ defmodule CloudOS.Notifications.Dispatcher do
       binding_options: [routing_key: "notifications_hipchat"]
     }
 
-    subscribe(connection_options, hipchat_queue, fn(payload, _meta) -> dispatch_hipchat_notification(payload) end)
+    subscribe(connection_options, hipchat_queue, fn(payload, _meta, async_info) -> dispatch_hipchat_notification(payload, async_info) end)
   end
 
   @doc """
-  Method to dispatch HipChat notifications to the HipChat publisher
+  Method to dispatch HipChat notifications to the HipChat publisher.
 
   ## Options
 
   The `payload` option is the Map of HipChat options
 
+  The `_async_info` option defines the Messaging module's asynchronous messaging info
+
   ## Return Value
 
   :ok | {:error, reason}
   """
-  @spec dispatch_hipchat_notification(Map) :: :ok | {:error, String.t()}
-  def dispatch_hipchat_notification(payload) do
-  	color = if (payload[:is_success]), do: "green", else: "red"
+  @spec dispatch_hipchat_notification(Map, Map) :: :ok | {:error, String.t()}
+  def dispatch_hipchat_notification(payload, %{subscription_handler: subscription_handler, delivery_tag: delivery_tag} = _async_info) do
 
-    default_room = Configuration.get_hipchat_config("HIPCHAT_DEFAULT_ROOM_NAME", :default_room_name)
-    room_names = if payload[:room_names] != nil do
-      payload[:room_names]
-      |> Enum.reduce Map.put(%{}, default_room, default_room), fn (room, room_map) ->
-          Map.put(room_map, room, room)
-         end
-      |> Map.keys
-    else
-      [default_room]
-    end
+    # Until there's a strong usecase for requiring requeue of failed HipChat messages, simply ack/reject here rather than tracking the
+    # delivery tags separately.
+    try do
+    	color = if (payload[:is_success]), do: "green", else: "red"
 
-    room_ids = Room.resolve_room_ids(room_names)
-    Enum.reduce room_ids, :ok, fn (room_id, result) ->
-      if result == :ok do
-        notification_params = %{
-          room_id: room_id,
-          message_prefix: payload[:prefix],
-          message: payload[:message],
-          color: color,
-          notify: !payload[:is_success]
-        }
-
-        case HipchatPublisher.send_notification(HipchatPublisher.create!, %{room_notification: RoomNotification.create!(notification_params)}) do
-          :ok -> :ok
-          {:error, reason} -> {:error, reason}
-        end
+      default_room = Configuration.get_hipchat_config("HIPCHAT_DEFAULT_ROOM_NAME", :default_room_name)
+      room_names = if payload[:room_names] != nil do
+        payload[:room_names]
+        |> Enum.reduce Map.put(%{}, default_room, default_room), fn (room, room_map) ->
+            Map.put(room_map, room, room)
+           end
+        |> Map.keys
       else
-        result
+        [default_room]
       end
-    end
+
+      room_ids = Room.resolve_room_ids(room_names)
+      Enum.reduce room_ids, :ok, fn (room_id, result) ->
+        if result == :ok do
+          notification_params = %{
+            room_id: room_id,
+            message_prefix: payload[:prefix],
+            message: payload[:message],
+            color: color,
+            notify: !payload[:is_success]
+          }
+
+          case HipchatPublisher.send_notification(HipchatPublisher.create!, %{room_notification: RoomNotification.create!(notification_params)}) do
+            :ok -> 
+              SubscriptionHandler.acknowledge(subscription_handler, delivery_tag)
+              :ok
+            {:error, reason} -> 
+              SubscriptionHandler.reject(subscription_handler, delivery_tag, false)
+              {:error, reason}
+          end
+        else
+          result
+        end
+      end
+    rescue e ->
+      error_msg = "An error occurred publishing notification:  #{inspect e}"
+      Logger.error(error_msg)
+      SubscriptionHandler.reject(subscription_handler, delivery_tag, false)
+      {:error, error_msg}
+    end      
   end
 end
