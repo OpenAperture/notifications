@@ -1,23 +1,28 @@
-# CloudOS.Notifications
+# OpenAperture.Notifications
 
-The Notifications module provides a standardized mechanism to publish events that occur within CloudOS.  The following notification providers are supported:
+The Notifications module provides a standardized mechanism to publish events that occur within OpenAperture.  
 
-* HipChat
+## Module Responsibilities
 
-## HipChat Notifications
+The Notifications module is responsible for the following actions within OpenAperture:
 
-Requests to publish HipChat notifications may be sent to the following queue:
+* Publishing HipChat notifications
 
-* notifications_hipchat
+## Messaging / Communication
 
-The message payload must conform to the following contract:
+The following message(s) may be sent to Notifications.  
 
-* Required Parameters:
-	* message - String containing the body of the message.
-	* is_success - Boolean.  If true, the message background will be set to green and no HipChat notifications will be generated.  False will set the message background to red and a HipChat notification will be generated.
-* Optional Parameters:
-	* room_names - List of Strings, each string containing the name of a HipChat room to which to publish the message.  The default room (defined in the module configuration) does not need to be specified.
-	* prefix - String containing a prefix for the message.  A timestamp (UTC) will be prepended automatically to the message, or this prefix value.
+* Publish a HipChat Message
+  * Queue:  notifications_hipchat
+  * Payload (Map)
+    * message (required)
+      * String containing the body of the message.
+    * is_success (required)
+      * Boolean.  If true, the message background will be set to green and no HipChat notifications will be generated.  False will set the message background to red and a HipChat notification will be generated.
+    * room_names (optional)
+      * List of Strings, each string containing the name of a HipChat room to which to publish the message.  The default room (defined in the module configuration) does not need to be specified.
+    * prefix (optional)
+      * String containing a prefix for the message.  A timestamp (UTC) will be prepended automatically to the message, or this prefix value.
 
 Here's an example payload:
 ```json
@@ -38,66 +43,34 @@ Fri, 13 Mar 2015 19:17:25 UTC Testing: This is a test of the Notifications modul
 
 The following configuration values must be defined either as environment variables or as part of the environment configuration files:
 
-* AMQP Username
-	* Type:  String
-	* Description:  The username for the AMQP connection
-  * Environment Variable:  MESSAGING_USERNAME
-  * Environment Configuration (<env>.exs):  :cloudos_messaging, :username
-* AMQP Password
-	* Type:  String
-	* Description:  The password for the AMQP connection
-  * Environment Variable:  MESSAGING_PASSWORD
-  * Environment Configuration (<env>.exs):  :cloudos_messaging, :password
-* AMQP Host
-	* Type:  String
-	* Description:  The host for the AMQP connection
-  * Environment Variable:  MESSAGING_HOST
-  * Environment Configuration (<env>.exs):  :cloudos_messaging, :host
-* AMQP Virtual Host
-	* Type:  String
-	* Description:  The virtual host for the AMQP connection
-  * Environment Variable:  MESSAGING_VIRTUAL_HOST
-  * Environment Configuration (<env>.exs):  :cloudos_messaging, :virtual_host
-* Failover AMQP Username
+* Current Exchange
   * Type:  String
-  * Description:  The username for the failover AMQP connection
-  * Environment Variable:  FAILOVER_MESSAGING_USERNAME
-  * Environment Configuration (<env>.exs):  :cloudos_messaging, :failover_username
-* Failover AMQP Password
+  * Description:  The identifier of the exchange in which Notifications is running
+  * Environment Variable:  EXCHANGE_ID
+* Current Broker
   * Type:  String
-  * Description:  The password for the failover AMQP connection
-  * Environment Variable:  FAILOVER_MESSAGING_PASSWORD
-  * Environment Configuration (<env>.exs):  :cloudos_messaging, :failover_password
-* Failover AMQP Host
-  * Type:  String
-  * Description:  The host for the failover AMQP connection
-  * Environment Variable:  FAILOVER_MESSAGING_HOST
-  * Environment Configuration (<env>.exs):  :cloudos_messaging, :failover_host
-* Failover AMQP Virtual Host
-  * Type:  String
-  * Description:  The virtual host for the failover AMQP connection
-  * Environment Variable:  FAILOVER_MESSAGING_VIRTUAL_HOST
-  * Environment Configuration (<env>.exs):  :cloudos_messaging, :failover_virtual_host
-* AMQP Exchange
-	* Type:  String
-	* Description:  The exchange for the AMQP connection
-  * Environment Variable:  MESSAGING_EXCHANGE
-  * Environment Configuration (<env>.exs):  :cloudos_messaging, :exchange
-* Failover AMQP Exchange
-  * Type:  String
-  * Description:  The failover exchange for the failover AMQP connection
-  * Environment Variable:  FAILOVER_MESSAGING_EXCHANGE
-  * Environment Configuration (<env>.exs):  :cloudos_messaging, :failover_exchange
-* HipChat Authentication Tokens
-	* Type:  Comma delimited string (no spaces)
-	* Description:  A comma delimited string of [HipChat authentication tokens](https://www.hipchat.com/docs/apiv2/auth), used for publishing messages to HipChat.
-  * Environment Variable:  HIPCHAT_AUTH_TOKENS
-  * Environment Configuration (<env>.exs):  :hipchat, :auth_tokens
-* HipChat Authentication Tokens
-	* Type:  String
-	* Description:  A default room name must be configured as part of the module, to ensure that all messages are published somewhere.
-  * Environment Variable:  HIPCHAT_DEFAULT_ROOM_NAME
-  * Environment Configuration (<env>.exs):  :hipchat, :default_room_name
+  * Description:  The identifier of the broker to which Notifications is connecting
+  * Environment Variable:  BROKER_ID
+* Manager URL
+  * Type: String
+  * Description: The url of the OpenAperture Manager
+  * Environment Variable:  MANAGER_URL
+  * Environment Configuration (.exs): :openaperture_manager_api, :manager_url
+* OAuth Login URL
+  * Type: String
+  * Description: The login url of the OAuth2 server
+  * Environment Variable:  OAUTH_LOGIN_URL
+  * Environment Configuration (.exs): :openaperture_manager_api, :oauth_login_url
+* OAuth Client ID
+  * Type: String
+  * Description: The OAuth2 client id to be used for authenticating with the OpenAperture Manager
+  * Environment Variable:  OAUTH_CLIENT_ID
+  * Environment Configuration (.exs): :openaperture_manager_api, :oauth_client_id
+* OAuth Client Secret
+  * Type: String
+  * Description: The OAuth2 client secret to be used for authenticating with the OpenAperture Manager
+  * Environment Variable:  OAUTH_CLIENT_SECRET
+  * Environment Configuration (.exs): :openaperture_manager_api, :oauth_client_secret
 
 ## Building & Testing
 
@@ -125,24 +98,7 @@ MIX_ENV=test mix test test/
 
 If you want to run the RabbitMQ system tests (i.e. hit a live system):
 
-1.  Define a new configuration for the "system" environment (config/system.exs) with the following contents:
-
-```
-config :cloudos_messaging,
-  username: "user",
-  password: "pass",
-  virtual_host: "env",
-  host: "host.myrabbit.com"
-
-config :hipchat,
-  auth_tokens: "123abc,789xyz",
-  default_room_name: "Events"
-
-config :logger, :console,
-  level: :debug
-```
-
-2.  Run the following commands on separate machines, able to access the RabbitMQ server:
+Run the following commands on separate machines, able to access the RabbitMQ server:
 
 ```iex
 MIX_ENV=system mix test test/external/publisher_test.exs --include external:true
