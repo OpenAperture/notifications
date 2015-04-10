@@ -73,6 +73,11 @@ The following configuration values must be defined either as environment variabl
   * Description: The OAuth2 client secret to be used for authenticating with the OpenAperture Manager
   * Environment Variable:  OAUTH_CLIENT_SECRET
   * Environment Configuration (.exs): :openaperture_manager_api, :oauth_client_secret
+* Default HipChat Room
+  * Type: String
+  * Description: The default room for all HipChat messages
+  * Environment Variable:  HIPCHAT_DEFAULT_ROOM_NAME
+  * Environment Configuration (.exs): :hipchat, :default_room_name
 
 ## Building & Testing
 
