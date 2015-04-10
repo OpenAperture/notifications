@@ -78,7 +78,7 @@ The following configuration values must be defined either as environment variabl
   * Description: The default room for all HipChat messages
   * Environment Variable:  HIPCHAT_DEFAULT_ROOM_NAME
   * Environment Configuration (.exs): :hipchat, :default_room_name
-
+ 
 ## Building & Testing
 
 ### Building
