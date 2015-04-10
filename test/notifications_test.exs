@@ -1,4 +1,4 @@
-defmodule CloudOS.NotificationsTest do
+defmodule OpenAperture.NotificationsTest do
   use ExUnit.Case
 
   test "the truth" do

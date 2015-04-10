@@ -1,7 +1,7 @@
 defmodule Agents.Notifications.HipchatRoomNotificationTests do
   use ExUnit.Case
 
-  alias CloudOS.Notifications.Hipchat.RoomNotification
+  alias OpenAperture.Notifications.Hipchat.RoomNotification
 
   test "sets defaults" do
     notification = RoomNotification.create!(%{})

@@ -5,9 +5,9 @@
 #
 require Logger
 
-defmodule CloudOS.Notifications.Hipchat.Room do
+defmodule OpenAperture.Notifications.Hipchat.Room do
 
-  alias CloudOS.Notifications.Hipchat.AuthToken
+  alias OpenAperture.Notifications.Hipchat.AuthToken
 
   @doc """
   Starts a `GenServer` process linked to the current process.

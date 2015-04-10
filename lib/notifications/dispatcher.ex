@@ -5,25 +5,27 @@
 #
 require Logger
 
-defmodule CloudOS.Notifications.Dispatcher do
+defmodule OpenAperture.Notifications.Dispatcher do
 	use GenServer
 
-	alias CloudOS.Messaging.AMQP.ConnectionOptions, as: AMQPConnectionOptions
-	alias CloudOS.Messaging.AMQP.Exchange, as: AMQPExchange
-	alias CloudOS.Messaging.Queue
-  alias CloudOS.Messaging.AMQP.SubscriptionHandler
+  alias OpenAperture.Messaging.AMQP.ConnectionOptions, as: AMQPConnectionOptions
+  alias OpenAperture.Messaging.AMQP.QueueBuilder
+  alias OpenAperture.Messaging.AMQP.SubscriptionHandler
 
-	alias CloudOS.Notifications.Hipchat.RoomNotification
-  alias CloudOS.Notifications.Hipchat.Room
-	alias CloudOS.Notifications.Hipchat.Publisher, as: HipchatPublisher
+	alias OpenAperture.Notifications.Hipchat.RoomNotification
+  alias OpenAperture.Notifications.Hipchat.Room
+	alias OpenAperture.Notifications.Hipchat.Publisher, as: HipchatPublisher
 
-  alias CloudOS.Notifications.Configuration
+  alias OpenAperture.Notifications.Configuration
+
+  alias OpenAperture.ManagerApi
+
   @moduledoc """
   This module contains the logic to dispatch notification messsages to the appropriate GenServer(s) 
   """  
 
 	@connection_options nil
-	use CloudOS.Messaging
+	use OpenAperture.Messaging
 
   @doc """
   Specific start_link implementation (required by the supervisor)
@@ -38,16 +40,20 @@ defmodule CloudOS.Notifications.Dispatcher do
   def start_link do
     case GenServer.start_link(__MODULE__, %{}, name: __MODULE__) do
     	{:error, reason} -> 
-        Logger.error("Failed to start CloudOS Notifications:  #{inspect reason}")
+        Logger.error("Failed to start OpenAperture Notifications:  #{inspect reason}")
         {:error, reason}
     	{:ok, pid} ->
         try do
-      		case register_queues do
-            :ok -> {:ok, pid}
-            {:error, reason} -> 
-              Logger.error("Failed to register notification queues:  #{inspect reason}")
-              {:ok, pid}
-          end    		
+          if Application.get_env(:autostart, :register_queues, false) do
+        		case register_queues do
+              :ok -> {:ok, pid}
+              {:error, reason} -> 
+                Logger.error("Failed to register notification queues:  #{inspect reason}")
+                {:ok, pid}
+            end    		
+          else
+            {:ok, pid}
+          end
         rescue e in _ ->
           Logger.error("An error occurred registering notification queues:  #{inspect e}")
           {:ok, pid}          
@@ -65,26 +71,11 @@ defmodule CloudOS.Notifications.Dispatcher do
   @spec register_queues() :: :ok | {:error, String.t()}
   def register_queues do
     Logger.debug("Registering notification queues...")
-    connection_options = %AMQPConnectionOptions{
-      username: Configuration.get_messaging_config("MESSAGING_USERNAME", :username),
-      password: Configuration.get_messaging_config("MESSAGING_PASSWORD", :password),
-      virtual_host: Configuration.get_messaging_config("MESSAGING_VIRTUAL_HOST", :virtual_host),
-      host: Configuration.get_messaging_config("MESSAGING_HOST", :host),
-      failover_username: Configuration.get_messaging_config("FAILOVER_MESSAGING_USERNAME", :failover_username),
-      failover_password: Configuration.get_messaging_config("FAILOVER_MESSAGING_PASSWORD", :failover_password),
-      failover_virtual_host: Configuration.get_messaging_config("FAILOVER_MESSAGING_VIRTUAL_HOST", :failover_virtual_host),
-      failover_host: Configuration.get_messaging_config("FAILOVER_MESSAGING_HOST", :failover_host)
-    }
 
-    hipchat_queue = %Queue{
-      name: "notifications_hipchat", 
-      exchange: %AMQPExchange{name: Configuration.get_messaging_config("MESSAGING_EXCHANGE", :exchange), failover_name: Configuration.get_messaging_config("FAILOVER_MESSAGING_EXCHANGE", :failover_exchange), options: [:durable]},
-      error_queue: "notifications_error",
-      options: [durable: true, arguments: [{"x-dead-letter-exchange", :longstr, ""},{"x-dead-letter-routing-key", :longstr, "notifications_error"}]],
-      binding_options: [routing_key: "notifications_hipchat"]
-    }
+    notifications_hipchat_queue = QueueBuilder.build(ManagerApi.get_api, "notifications_hipchat", Configuration.get_current_exchange_id)
 
-    subscribe(connection_options, hipchat_queue, fn(payload, _meta, async_info) -> dispatch_hipchat_notification(payload, async_info) end)
+    options = OpenAperture.Messaging.ConnectionOptionsResolver.get_for_broker(ManagerApi.get_api, Configuration.get_current_broker_id)
+    subscribe(options, notifications_hipchat_queue, fn(payload, _meta, async_info) -> dispatch_hipchat_notification(payload, async_info) end)
   end
 
   @doc """

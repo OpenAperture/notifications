@@ -2,8 +2,8 @@ defmodule Agents.Notifications.HipchatRoomTests do
   use ExUnit.Case
   use ExVCR.Mock, adapter: ExVCR.Adapter.Httpc
 
-  alias CloudOS.Notifications.Hipchat.Room
-  alias CloudOS.Notifications.Hipchat.AuthToken
+  alias OpenAperture.Notifications.Hipchat.Room
+  alias OpenAperture.Notifications.Hipchat.AuthToken
 
 	setup_all do
     Room.start_link

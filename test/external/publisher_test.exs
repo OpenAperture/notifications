@@ -1,23 +1,23 @@
 require Logger
 
-defmodule CloudOS.Notifications.TestConsumerPub do
+defmodule OpenAperture.Notifications.TestConsumerPub do
 
-	alias CloudOS.Messaging.Queue
-	alias CloudOS.Messaging.ConnectionOptions
-	alias CloudOS.Messaging.AMQP.ConnectionOptions
-	alias CloudOS.Messaging.AMQP.Exchange, as: AMQPExchange
+	alias OpenAperture.Messaging.Queue
+	alias OpenAperture.Messaging.ConnectionOptions
+	alias OpenAperture.Messaging.AMQP.ConnectionOptions
+	alias OpenAperture.Messaging.AMQP.Exchange, as: AMQPExchange
 
-	@connection_options %CloudOS.Messaging.AMQP.ConnectionOptions{
-		username: Application.get_env(:cloudos_messaging, :username),
-		password: Application.get_env(:cloudos_messaging, :password),
-		virtual_host: Application.get_env(:cloudos_messaging, :virtual_host),
-		host: Application.get_env(:cloudos_messaging, :host)
+	@connection_options %OpenAperture.Messaging.AMQP.ConnectionOptions{
+		username: Application.get_env(:openaperture_messaging, :username),
+		password: Application.get_env(:openaperture_messaging, :password),
+		virtual_host: Application.get_env(:openaperture_messaging, :virtual_host),
+		host: Application.get_env(:openaperture_messaging, :host)
 	}
-	use CloudOS.Messaging
+	use OpenAperture.Messaging
 
 	@queue %Queue{
       name: "notifications_hipchat", 
-      exchange: %AMQPExchange{name: Application.get_env(:cloudos_messaging, :exchange), options: [:durable]},
+      exchange: %AMQPExchange{name: Application.get_env(:openaperture_messaging, :exchange), options: [:durable]},
       error_queue: "notifications_error",
       options: [durable: true, arguments: [{"x-dead-letter-exchange", :longstr, ""},{"x-dead-letter-routing-key", :longstr, "notifications_error"}]],
       binding_options: [routing_key: "notifications_hipchat"]
@@ -29,14 +29,14 @@ defmodule CloudOS.Notifications.TestConsumerPub do
 	end
 end
 
-defmodule CloudOS.Notifications.PublishTest do
+defmodule OpenAperture.Notifications.PublishTest do
   use ExUnit.Case
   @moduletag :external
 
-  alias CloudOS.Notifications.TestConsumerPub
+  alias OpenAperture.Notifications.TestConsumerPub
 
   test "publish" do
-  	CloudOS.Messaging.AMQP.ConnectionPools.start_link
+  	OpenAperture.Messaging.AMQP.ConnectionPools.start_link
 
   	hipchat_notification = %{
       prefix: "Testing",

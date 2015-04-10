@@ -5,7 +5,7 @@
 #
 require Logger
 
-defmodule CloudOS.Notifications.Supervisor do
+defmodule OpenAperture.Notifications.Supervisor do
   use Supervisor
 
   @moduledoc """
@@ -23,7 +23,7 @@ defmodule CloudOS.Notifications.Supervisor do
   """
   @spec start_link() :: {:ok, pid} | {:error, String.t()} 
   def start_link do
-    Logger.info("Starting CloudOS.Notifications.Supervisor...")
+    Logger.info("Starting OpenAperture.Notifications.Supervisor...")
     :supervisor.start_link(__MODULE__, [])
   end
 
@@ -44,9 +44,9 @@ defmodule CloudOS.Notifications.Supervisor do
 
     children = [
       # Define workers and child supervisors to be supervised
-      worker(CloudOS.Notifications.Dispatcher, []),
-      worker(CloudOS.Notifications.Hipchat.AuthToken, []),
-      worker(CloudOS.Notifications.Hipchat.Room, [])
+      worker(OpenAperture.Notifications.Dispatcher, []),
+      worker(OpenAperture.Notifications.Hipchat.AuthToken, []),
+      worker(OpenAperture.Notifications.Hipchat.Room, [])
     ]
 
     opts = [strategy: :one_for_one, name: __MODULE__]

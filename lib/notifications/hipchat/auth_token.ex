@@ -5,9 +5,9 @@
 #
 require Logger
 
-defmodule CloudOS.Notifications.Hipchat.AuthToken do
+defmodule OpenAperture.Notifications.Hipchat.AuthToken do
 
-  alias CloudOS.Notifications.Configuration
+  alias OpenAperture.Notifications.Configuration
 
   @doc """
   Starts a `GenServer` process linked to the current process.
@@ -69,7 +69,7 @@ defmodule CloudOS.Notifications.Hipchat.AuthToken do
   end
 
   @doc """
-  This module contains the logic for storing the CloudOS workflow queue.
+  This module contains the logic for storing the OpenAperture workflow queue.
 
   ## Return values
 

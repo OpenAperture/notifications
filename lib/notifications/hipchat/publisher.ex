@@ -8,7 +8,7 @@ require Logger
 require Timex.Date
 require Timex.Time
 
-defmodule CloudOS.Notifications.Hipchat.Publisher do
+defmodule OpenAperture.Notifications.Hipchat.Publisher do
   
   @moduledoc """
   This module contains the server for managing/handling HipChat notifications
@@ -17,8 +17,8 @@ defmodule CloudOS.Notifications.Hipchat.Publisher do
   use GenServer
   use Timex
 
-  alias CloudOS.Notifications.Hipchat.RoomNotification
-  alias CloudOS.Notifications.Hipchat.AuthToken
+  alias OpenAperture.Notifications.Hipchat.RoomNotification
+  alias OpenAperture.Notifications.Hipchat.AuthToken
 
   @doc """
   Starts a `GenServer` process linked to the current process.
@@ -112,8 +112,8 @@ defmodule CloudOS.Notifications.Hipchat.Publisher do
               end
             end
 
-            rate_reset_time = CloudOS.Timex.Extensions.time_from_unix_timestamp(rate_limit_reset)
-            rate_reset_timestamp = CloudOS.Timex.Extensions.get_elapased_timestamp(rate_reset_time)
+            rate_reset_time = OpenAperture.Timex.Extensions.time_from_unix_timestamp(rate_limit_reset)
+            rate_reset_timestamp = OpenAperture.Timex.Extensions.get_elapased_timestamp(rate_reset_time)
             Logger.debug("Successfully send hipchat notification.  Rate limit is currently at #{rate_limit_remaining}/#{rate_limit}; next reset in #{rate_reset_timestamp}")
 
             if (rate_limit_remaining <= 0) do

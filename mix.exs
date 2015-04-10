@@ -1,14 +1,14 @@
-defmodule CloudOS.Notifications.Mixfile do
+defmodule OpenAperture.Notifications.Mixfile do
   use Mix.Project
 
   @version "0.0.1"
 
   def project do
-    [app: :cloudos_notifications,
+    [app: :openaperture_notifications,
      version: get_version,
      elixir: "~> 1.0",      
      elixirc_paths: ["lib"],
-     escript: [main_module: CloudOS.Notifications],
+     escript: [main_module: OpenAperture.Notifications],
      deps: deps]
   end
 
@@ -26,8 +26,8 @@ defmodule CloudOS.Notifications.Mixfile do
   # Type `mix help compile.app` for more information
   def application do
     [
-      mod: { CloudOS.Notifications, [] },
-      applications: [:logger, :cloudos_messaging]
+      mod: { OpenAperture.Notifications, [] },
+      applications: [:logger, :openaperture_messaging, :openaperture_manager_api]
     ]
   end
 
@@ -42,13 +42,16 @@ defmodule CloudOS.Notifications.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [
-      {:json, "~> 0.3.2"},
-      {:cloudos_messaging, git: "https://#{System.get_env("GITHUB_OAUTH_TOKEN")}:x-oauth-basic@github.com/UmbrellaCorporation-SecretProjectLab/cloudos_messaging.git", ref: "2db6e25c6e596889f34ee9254c0198c98a180611", override: true},
-      {:timex_extensions, git: "https://#{System.get_env("GITHUB_OAUTH_TOKEN")}:x-oauth-basic@github.com/UmbrellaCorporation-SecretProjectLab/timex_extensions.git", ref: "7cf7cea363155eb753415a2f2c4f7a81db520c53", override: true},
+      {:poison, "~> 1.3.1"},
+      {:openaperture_messaging, git: "https://#{System.get_env("GITHUB_OAUTH_TOKEN")}:x-oauth-basic@github.com/OpenAperture/messaging.git", ref: "3211204ba8d949b76bc3373ee91260944cc0ff6b", override: true},
+      {:openaperture_manager_api, git: "https://#{System.get_env("GITHUB_OAUTH_TOKEN")}:x-oauth-basic@github.com/OpenAperture/manager_api.git", ref: "f67a4570ec4b46cb2b2bb746924b322eec1e3178", override: true},
+
+      {:timex, "~> 0.12.9"},
+      {:timex_extensions, git: "https://#{System.get_env("GITHUB_OAUTH_TOKEN")}:x-oauth-basic@github.com/OpenAperture/timex_extensions.git", ref: "ab9d8820625171afbb80ccba1aa48feeb43dd790", override: true},
 
       #test dependencies
-      {:exvcr, github: "parroty/exvcr", override: true, only: :test},
-      {:meck, "0.8.2", only: :test}      
+      {:exvcr, github: "parroty/exvcr", override: true},
+      {:meck, "0.8.2", override: true}     
     ]
   end
 end

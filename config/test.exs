@@ -15,12 +15,18 @@ use Mix.Config
 #       format: "$date $time [$level] $metadata$message\n",
 #       metadata: [:user_id]
 
-config :cloudos_messaging,
-	username: "user",
-	password: "pass",
-	virtual_host: "staging",
-	host: "rabbithost",
-	exchange: "us-east-1b"
+config :autostart,
+	register_queues: false
+	
+config :openaperture_manager_api, 
+	manager_url: System.get_env("MANAGER_URL") || "https://openaperture-mgr.host.co",
+	oauth_login_url: System.get_env("OAUTH_LOGIN_URL") || "https://auth.host.co",
+	oauth_client_id: System.get_env("OAUTH_CLIENT_ID") ||"id",
+	oauth_client_secret: System.get_env("OAUTH_CLIENT_SECRET") || "secret"
+
+config :openaperture_notifications, 
+	exchange_id: "1",
+	broker_id: "1"
 
 config :hipchat,
   auth_tokens: "123abc,234xyz",

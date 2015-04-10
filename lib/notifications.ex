@@ -1,15 +1,15 @@
 #
-# == cloudos_notifications.ex
+# == notifications.ex
 #
-# This module contains definition the CloudOS Notifications implementation
+# This module contains definition the OpenAperture Notifications implementation
 #
 require Logger
 
-defmodule CloudOS.Notifications do
+defmodule OpenAperture.Notifications do
 	use Application
 
   @moduledoc """
-  This module contains definition the CloudOS Notifications implementation
+  This module contains definition the OpenAperture Notifications implementation
   """  
 
   @doc """
@@ -49,10 +49,10 @@ defmodule CloudOS.Notifications do
   @spec start(atom, [any]) :: :ok | {:error, String.t()}
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
-    Logger.info("Starting CloudOS.Notifications...")
+    Logger.info("Starting OpenAperture.Notifications...")
     children = [
       # Define workers and child supervisors to be supervised
-      supervisor(CloudOS.Notifications.Supervisor, [])
+      supervisor(OpenAperture.Notifications.Supervisor, [])
     ]
 
     opts = [strategy: :one_for_one, name: __MODULE__]

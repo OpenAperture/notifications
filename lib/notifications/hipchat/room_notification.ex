@@ -7,7 +7,7 @@ require Logger
 require Timex.Date
 require Timex.Time
 
-defmodule CloudOS.Notifications.Hipchat.RoomNotification do
+defmodule OpenAperture.Notifications.Hipchat.RoomNotification do
   use Timex
 
   @doc """
@@ -80,7 +80,7 @@ defmodule CloudOS.Notifications.Hipchat.RoomNotification do
   """
   @spec create!(Map) :: pid
   def create!(options) do
-    case CloudOS.Notifications.Hipchat.RoomNotification.create(options) do
+    case OpenAperture.Notifications.Hipchat.RoomNotification.create(options) do
       {:ok, notification} -> notification
       {:error, reason} -> raise "Failed to create hipchat room notification: #{reason}"
     end

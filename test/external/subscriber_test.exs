@@ -1,15 +1,15 @@
-defmodule CloudOS.Notifications.SubscribeTest do
+defmodule OpenAperture.Notifications.SubscribeTest do
   use ExUnit.Case
   @moduletag :external
 
-  alias CloudOS.Notifications.Hipchat.Room
-  alias CloudOS.Notifications.Hipchat.AuthToken
-  alias CloudOS.Notifications.Hipchat.Publisher
-  alias CloudOS.Notifications.Hipchat.RoomNotification
-  alias CloudOS.Notifications.Dispatcher
+  alias OpenAperture.Notifications.Hipchat.Room
+  alias OpenAperture.Notifications.Hipchat.AuthToken
+  alias OpenAperture.Notifications.Hipchat.Publisher
+  alias OpenAperture.Notifications.Hipchat.RoomNotification
+  alias OpenAperture.Notifications.Dispatcher
 
   test "subscribe" do
-  	CloudOS.Messaging.AMQP.ConnectionPools.start_link
+  	OpenAperture.Messaging.AMQP.ConnectionPools.start_link
     Room.start_link
     AuthToken.start_link  
 

@@ -1,20 +1,22 @@
-defmodule CloudOS.Notifications.DispatcherTests do
+defmodule OpenAperture.Notifications.DispatcherTests do
   use ExUnit.Case
   use ExVCR.Mock, adapter: ExVCR.Adapter.Httpc
 
-  alias CloudOS.Notifications.Dispatcher
-  alias CloudOS.Notifications.Hipchat.Room
-  alias CloudOS.Notifications.Hipchat.AuthToken
-  alias CloudOS.Notifications.Hipchat.Publisher, as: HipchatPublisher
-  alias CloudOS.Notifications.Hipchat.RoomNotification
+  alias OpenAperture.Notifications.Dispatcher
+  alias OpenAperture.Notifications.Hipchat.Room
+  alias OpenAperture.Notifications.Hipchat.AuthToken
+  alias OpenAperture.Notifications.Hipchat.Publisher, as: HipchatPublisher
+  alias OpenAperture.Notifications.Hipchat.RoomNotification
 
-  alias CloudOS.Messaging.Queue
-  alias CloudOS.Messaging.ConnectionOptions
-  alias CloudOS.Messaging.AMQP.ConnectionOptions
-  alias CloudOS.Messaging.AMQP.ConnectionPool
-  alias CloudOS.Messaging.AMQP.ConnectionPools
-  alias CloudOS.Messaging.AMQP.Exchange, as: AMQPExchange
-  alias CloudOS.Messaging.AMQP.SubscriptionHandler
+  alias OpenAperture.Messaging.Queue
+  alias OpenAperture.Messaging.ConnectionOptions
+  alias OpenAperture.Messaging.AMQP.ConnectionOptions
+  alias OpenAperture.Messaging.AMQP.ConnectionPool
+  alias OpenAperture.Messaging.AMQP.ConnectionPools
+  alias OpenAperture.Messaging.AMQP.SubscriptionHandler
+  alias OpenAperture.Messaging.ConnectionOptionsResolver
+  alias OpenAperture.Messaging.AMQP.QueueBuilder
+  alias OpenAperture.Messaging.AMQP.ConnectionOptions, as: AMQPConnectionOptions
   
 	setup_all do
     Room.start_link
@@ -28,32 +30,48 @@ defmodule CloudOS.Notifications.DispatcherTests do
 
   test "register_queues success" do
     :meck.new(ConnectionPools, [:passthrough])
-    :meck.expect(ConnectionPools, :get_pool, fn opts -> %{} end)
+    :meck.expect(ConnectionPools, :get_pool, fn _ -> %{} end)
 
     :meck.new(ConnectionPool, [:passthrough])
-    :meck.expect(ConnectionPool, :subscribe, fn pool, exchange, queue, callback -> :ok end)
+    :meck.expect(ConnectionPool, :subscribe, fn _, _, _, _ -> :ok end)
+
+    :meck.new(ConnectionOptionsResolver, [:passthrough])
+    :meck.expect(ConnectionOptionsResolver, :get_for_broker, fn _, _ -> %AMQPConnectionOptions{} end)
+
+    :meck.new(QueueBuilder, [:passthrough])
+    :meck.expect(QueueBuilder, :build, fn _,_,_ -> %OpenAperture.Messaging.Queue{name: ""} end)      
 
     assert Dispatcher.register_queues == :ok
   after
     :meck.unload(ConnectionPool)
     :meck.unload(ConnectionPools)
+    :meck.unload(ConnectionOptionsResolver)
+    :meck.unload(QueueBuilder)
   end
 
   test "register_queues failure" do
     :meck.new(ConnectionPools, [:passthrough])
-    :meck.expect(ConnectionPools, :get_pool, fn opts -> %{} end)
+    :meck.expect(ConnectionPools, :get_pool, fn _ -> %{} end)
 
     :meck.new(ConnectionPool, [:passthrough])
-    :meck.expect(ConnectionPool, :subscribe, fn pool, exchange, queue, callback -> {:error, "bad news bears"} end)
+    :meck.expect(ConnectionPool, :subscribe, fn _, _, _, _ -> {:error, "bad news bears"} end)
+
+    :meck.new(ConnectionOptionsResolver, [:passthrough])
+    :meck.expect(ConnectionOptionsResolver, :get_for_broker, fn _, _ -> %AMQPConnectionOptions{} end)    
+
+    :meck.new(QueueBuilder, [:passthrough])
+    :meck.expect(QueueBuilder, :build, fn _,_,_ -> %OpenAperture.Messaging.Queue{name: ""} end)     
 
     assert Dispatcher.register_queues == {:error, "bad news bears"}
   after
     :meck.unload(ConnectionPool)
     :meck.unload(ConnectionPools)
+    :meck.unload(ConnectionOptionsResolver)
+    :meck.unload(QueueBuilder)
   end
 
   # ===================================
-  # register_queues tests
+  # dispatch_hipchat_notification tests
 
   test "dispatch_hipchat_notification" do
     :meck.new(SubscriptionHandler, [:passthrough])

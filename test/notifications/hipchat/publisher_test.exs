@@ -1,11 +1,11 @@
-defmodule CloudOS.Notifications.Hipchat.PublisherTests do
+defmodule OpenAperture.Notifications.Hipchat.PublisherTests do
   use ExUnit.Case
   use ExVCR.Mock, adapter: ExVCR.Adapter.Httpc
 
-  alias CloudOS.Notifications.Hipchat.Room
-  alias CloudOS.Notifications.Hipchat.AuthToken
-  alias CloudOS.Notifications.Hipchat.Publisher
-  alias CloudOS.Notifications.Hipchat.RoomNotification
+  alias OpenAperture.Notifications.Hipchat.Room
+  alias OpenAperture.Notifications.Hipchat.AuthToken
+  alias OpenAperture.Notifications.Hipchat.Publisher
+  alias OpenAperture.Notifications.Hipchat.RoomNotification
   
 	setup_all do
     Room.start_link
