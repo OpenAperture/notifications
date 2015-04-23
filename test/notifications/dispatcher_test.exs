@@ -77,7 +77,7 @@ defmodule OpenAperture.Notifications.DispatcherTests do
     :meck.new(SubscriptionHandler, [:passthrough])
     :meck.expect(SubscriptionHandler, :acknowledge, fn _, _ -> :ok end)
     :meck.new(Room, [:passthrough])
-    :meck.expect(Room, :resolve_room_ids, fn names -> [123] end)
+    :meck.expect(Room, :resolve_room_ids, fn _ -> [123] end)
 
     prefix = "prefix"
     message = "test message"

@@ -34,3 +34,9 @@ config :hipchat,
 
 config :logger, :console,
   level: :debug
+
+config :openaperture_overseer_api,
+	module_type: :test,
+	autostart: false,	
+	exchange_id: "1",
+	broker_id: "1"

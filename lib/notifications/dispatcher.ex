@@ -17,6 +17,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
 	alias OpenAperture.Notifications.Hipchat.Publisher, as: HipchatPublisher
 
   alias OpenAperture.Notifications.Configuration
+  alias OpenAperture.Notifications.MessageManager
 
   alias OpenAperture.ManagerApi
 
@@ -75,7 +76,10 @@ defmodule OpenAperture.Notifications.Dispatcher do
     notifications_hipchat_queue = QueueBuilder.build(ManagerApi.get_api, "notifications_hipchat", Configuration.get_current_exchange_id)
 
     options = OpenAperture.Messaging.ConnectionOptionsResolver.get_for_broker(ManagerApi.get_api, Configuration.get_current_broker_id)
-    subscribe(options, notifications_hipchat_queue, fn(payload, _meta, async_info) -> dispatch_hipchat_notification(payload, async_info) end)
+    subscribe(options, notifications_hipchat_queue, fn(payload, _meta, async_info) -> 
+      MessageManager.track(async_info)
+      dispatch_hipchat_notification(payload, async_info) 
+    end)
   end
 
   @doc """
@@ -124,6 +128,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
           case HipchatPublisher.send_notification(HipchatPublisher.create!, %{room_notification: RoomNotification.create!(notification_params)}) do
             :ok -> 
               SubscriptionHandler.acknowledge(subscription_handler, delivery_tag)
+              MessageManager.remove(delivery_tag)
               :ok
             {:error, reason} -> 
               SubscriptionHandler.reject(subscription_handler, delivery_tag, false)
@@ -137,6 +142,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
       error_msg = "An error occurred publishing notification:  #{inspect e}"
       Logger.error(error_msg)
       SubscriptionHandler.reject(subscription_handler, delivery_tag, false)
+      MessageManager.remove(delivery_tag)
       {:error, error_msg}
     end      
   end
