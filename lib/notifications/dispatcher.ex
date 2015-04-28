@@ -76,9 +76,22 @@ defmodule OpenAperture.Notifications.Dispatcher do
     notifications_hipchat_queue = QueueBuilder.build(ManagerApi.get_api, "notifications_hipchat", Configuration.get_current_exchange_id)
 
     options = OpenAperture.Messaging.ConnectionOptionsResolver.get_for_broker(ManagerApi.get_api, Configuration.get_current_broker_id)
-    subscribe(options, notifications_hipchat_queue, fn(payload, _meta, async_info) -> 
-      MessageManager.track(async_info)
-      dispatch_hipchat_notification(payload, async_info) 
+    subscribe(options, notifications_hipchat_queue, fn(payload, _meta, %{subscription_handler: subscription_handler, delivery_tag: delivery_tag} = async_info) -> 
+      try do
+        Logger.debug("Starting to process request #{delivery_tag}")
+        MessageManager.track(async_info)
+        dispatch_hipchat_notification(payload, async_info) 
+      catch
+        :exit, code   -> 
+          Logger.error("Message #{delivery_tag} Exited with code #{inspect code}.  Payload:  #{inspect payload}")
+          SubscriptionHandler.acknowledge(subscription_handler, delivery_tag)
+        :throw, value -> 
+          Logger.error("Message #{delivery_tag} Throw called with #{inspect value}.  Payload:  #{inspect payload}")
+          SubscriptionHandler.acknowledge(subscription_handler, delivery_tag)
+        what, value   -> 
+          Logger.error("Message #{delivery_tag} Caught #{inspect what} with #{inspect value}.  Payload:  #{inspect payload}")
+          SubscriptionHandler.acknowledge(subscription_handler, delivery_tag)
+      end
     end)
   end
 
