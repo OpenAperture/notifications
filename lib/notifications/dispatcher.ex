@@ -73,7 +73,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
   def register_queues do
     Logger.debug("Registering notification queues...")
 
-    notifications_hipchat_queue = QueueBuilder.build(ManagerApi.get_api, "notifications_hipchat", Configuration.get_current_exchange_id)
+    notifications_hipchat_queue = QueueBuilder.build(ManagerApi.get_api, Configuration.get_current_queue_name, Configuration.get_current_exchange_id)
 
     options = OpenAperture.Messaging.ConnectionOptionsResolver.get_for_broker(ManagerApi.get_api, Configuration.get_current_broker_id)
     subscribe(options, notifications_hipchat_queue, fn(payload, _meta, %{subscription_handler: subscription_handler, delivery_tag: delivery_tag} = async_info) -> 
