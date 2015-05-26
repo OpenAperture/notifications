@@ -141,7 +141,7 @@ defmodule OpenAperture.Notifications.Hipchat.AuthToken do
       1 -> List.first(tokens)
       _ ->
         token_idx = :random.uniform(token_cnt)-1
-        {token, cur_idx} = Enum.reduce tokens, {"", 0}, fn (current_token, {token, cur_idx}) ->
+        {token, _cur_idx} = Enum.reduce tokens, {"", 0}, fn (current_token, {token, cur_idx}) ->
           if cur_idx == token_idx do
             {current_token, cur_idx+1}
           else

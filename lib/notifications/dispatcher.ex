@@ -8,7 +8,6 @@ require Logger
 defmodule OpenAperture.Notifications.Dispatcher do
 	use GenServer
 
-  alias OpenAperture.Messaging.AMQP.ConnectionOptions, as: AMQPConnectionOptions
   alias OpenAperture.Messaging.AMQP.QueueBuilder
   alias OpenAperture.Messaging.AMQP.SubscriptionHandler
 
@@ -26,7 +25,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
   """  
 
 	@connection_options nil
-	use OpenAperture.Messaging
+	use OpenAperture.Messaging  
 
   @doc """
   Specific start_link implementation (required by the supervisor)
