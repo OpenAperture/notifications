@@ -11,7 +11,7 @@ defmodule OpenAperture.Notifications.MessageManager do
 
   @moduledoc """
   This module contains the logic for associating message references with their subscription handlers
-  """  
+  """
 
   @doc """
   Creates a `GenServer` representing Docker host cluster.
@@ -19,7 +19,7 @@ defmodule OpenAperture.Notifications.MessageManager do
   ## Return values
   {:ok, pid} | {:error, String.t()}
   """
-  @spec start_link() :: {:ok, pid} | {:error, String.t()} 
+  @spec start_link() :: {:ok, pid} | {:error, String.t()}
   def start_link() do
     Agent.start_link(fn -> %{} end, name: __MODULE__)
   end
@@ -37,7 +37,7 @@ defmodule OpenAperture.Notifications.MessageManager do
   def track(%{subscription_handler: subscription_handler, delivery_tag: delivery_tag} = _async_info) do
     new_message = %{
       process: self(),
-      subscription_handler: subscription_handler, 
+      subscription_handler: subscription_handler,
       delivery_tag: delivery_tag,
       start_time: :calendar.universal_time
     }
@@ -70,7 +70,7 @@ defmodule OpenAperture.Notifications.MessageManager do
   """
   @spec remove(String.t()) :: Map
   def remove(delivery_tag) do
-    messages = Agent.get(__MODULE__, fn messages -> messages end)
+    messages        = Agent.get(__MODULE__, fn messages -> messages end)
     deleted_message = messages[delivery_tag]
     messages = Map.delete(messages, delivery_tag)
     
