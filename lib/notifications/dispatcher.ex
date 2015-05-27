@@ -8,7 +8,6 @@ defmodule OpenAperture.Notifications.Dispatcher do
   use     OpenAperture.Messaging
 
   alias OpenAperture.Messaging
-  alias Messaging.AMQP.ConnectionOptions, as: AMQPConnectionOptions
   alias Messaging.AMQP.QueueBuilder
   alias Messaging.AMQP.SubscriptionHandler
 
