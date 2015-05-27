@@ -41,9 +41,9 @@ defmodule OpenAperture.Notifications.Hipchat.RoomNotification do
     end
 
     if (resolved_options[:message_prefix] == nil) do
-      message_prefix = "#{get_timestamp()}"
+      message_prefix = ""
     else
-      message_prefix = "#{get_timestamp()} #{resolved_options[:message_prefix]}"
+      message_prefix = "#{resolved_options[:message_prefix]}"
       resolved_options = Map.delete(resolved_options, :message_prefix)
     end
 
@@ -84,19 +84,6 @@ defmodule OpenAperture.Notifications.Hipchat.RoomNotification do
       {:ok, notification} -> notification
       {:error, reason} -> raise "Failed to create hipchat room notification: #{reason}"
     end
-  end
-
-  @doc false
-  # Method to generate a string timestamp
-  #
-  ## Return Values
-  #
-  # String
-  #
-  @spec get_timestamp() :: String.t()
-  defp get_timestamp() do
-    date = Date.now()
-    DateFormat.format!(date, "{RFC1123}")
   end
 
   @doc """
