@@ -4,6 +4,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
   """
   require Logger
   use     GenServer
+  @connection_options nil
   use     OpenAperture.Messaging
 
   alias OpenAperture.Messaging
@@ -24,9 +25,6 @@ defmodule OpenAperture.Notifications.Dispatcher do
   @moduledoc """
   This module contains the logic to dispatch notification messsages to the appropriate GenServer(s) 
   """  
-
-	@connection_options nil
-	use OpenAperture.Messaging  
 
   @doc """
   Starts GenServer. Returns `{:ok, pid}` or {:error, reason}``
