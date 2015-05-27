@@ -7,7 +7,7 @@ require Logger
 
 defmodule OpenAperture.Notifications.MessageManager do
 
-  alias OpenAperture.OverseerApi.Heartbeat
+  #alias OpenAperture.OverseerApi.Heartbeat
 
   @moduledoc """
   This module contains the logic for associating message references with their subscription handlers
@@ -45,11 +45,11 @@ defmodule OpenAperture.Notifications.MessageManager do
     messages = Agent.get(__MODULE__, fn messages -> messages end)
     messages = Map.put(messages, delivery_tag, new_message)
 
-    workload = Enum.reduce Map.keys(messages), [], fn(delivery_tag, workload) ->
-      workload ++ [%{
-        description: "Request:  #{delivery_tag}"
-      }]
-    end
+    # workload = Enum.reduce Map.keys(messages), [], fn(delivery_tag, workload) ->
+    #   workload ++ [%{
+    #     description: "Request:  #{delivery_tag}"
+    #   }]
+    # end
     #Heartbeat.set_workload(workload)
 
     Agent.update(__MODULE__, fn _ -> messages end)
@@ -72,13 +72,13 @@ defmodule OpenAperture.Notifications.MessageManager do
   def remove(delivery_tag) do
     messages        = Agent.get(__MODULE__, fn messages -> messages end)
     deleted_message = messages[delivery_tag]
-    messages        = Map.delete(messages, delivery_tag)
-
-    workload = Enum.reduce Map.keys(messages), [], fn(delivery_tag, workload) ->
-      workload ++ [%{
-        description: "Request:  #{delivery_tag}"
-      }]
-    end
+    messages = Map.delete(messages, delivery_tag)
+    
+    # workload = Enum.reduce Map.keys(messages), [], fn(delivery_tag, workload) ->
+    #   workload ++ [%{
+    #     description: "Request:  #{delivery_tag}"
+    #   }]
+    # end
     #Heartbeat.set_workload(workload)
 
     Agent.update(__MODULE__, fn _ -> messages end)
