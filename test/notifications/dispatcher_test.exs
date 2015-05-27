@@ -17,11 +17,13 @@ defmodule OpenAperture.Notifications.DispatcherTests do
   alias OpenAperture.Messaging.ConnectionOptionsResolver
   alias OpenAperture.Messaging.AMQP.QueueBuilder
   alias OpenAperture.Messaging.AMQP.ConnectionOptions, as: AMQPConnectionOptions
-  
-	setup_all do
+
+  alias OpenAperture.Notifications.Mailer
+  setup_all do
     Room.start_link
-    AuthToken.start_link    
+    AuthToken.start_link
     ExVCR.Config.cassette_library_dir("fixture/vcr_cassettes", "fixture/custom_cassettes")
+    Mailman.TestServer.start && :ok
     :ok
   end
 
@@ -39,7 +41,7 @@ defmodule OpenAperture.Notifications.DispatcherTests do
     :meck.expect(ConnectionOptionsResolver, :get_for_broker, fn _, _ -> %AMQPConnectionOptions{} end)
 
     :meck.new(QueueBuilder, [:passthrough])
-    :meck.expect(QueueBuilder, :build, fn _,_,_ -> %OpenAperture.Messaging.Queue{name: ""} end)      
+    :meck.expect(QueueBuilder, :build, fn _,_,_ -> %OpenAperture.Messaging.Queue{name: ""} end)
 
     assert Dispatcher.register_queues == :ok
   after
@@ -57,10 +59,10 @@ defmodule OpenAperture.Notifications.DispatcherTests do
     :meck.expect(ConnectionPool, :subscribe, fn _, _, _, _ -> {:error, "bad news bears"} end)
 
     :meck.new(ConnectionOptionsResolver, [:passthrough])
-    :meck.expect(ConnectionOptionsResolver, :get_for_broker, fn _, _ -> %AMQPConnectionOptions{} end)    
+    :meck.expect(ConnectionOptionsResolver, :get_for_broker, fn _, _ -> %AMQPConnectionOptions{} end)
 
     :meck.new(QueueBuilder, [:passthrough])
-    :meck.expect(QueueBuilder, :build, fn _,_,_ -> %OpenAperture.Messaging.Queue{name: ""} end)     
+    :meck.expect(QueueBuilder, :build, fn _,_,_ -> %OpenAperture.Messaging.Queue{name: ""} end)
 
     assert Dispatcher.register_queues == {:error, "bad news bears"}
   after
@@ -71,9 +73,9 @@ defmodule OpenAperture.Notifications.DispatcherTests do
   end
 
   # ===================================
-  # dispatch_hipchat_notification tests
+  # send_hipchat_notifications tests
 
-  test "dispatch_hipchat_notification" do
+  test "send_hipchat_notification" do
     :meck.new(SubscriptionHandler, [:passthrough])
     :meck.expect(SubscriptionHandler, :acknowledge, fn _, _ -> :ok end)
     :meck.new(Room, [:passthrough])
@@ -83,7 +85,7 @@ defmodule OpenAperture.Notifications.DispatcherTests do
     message = "test message"
     is_success = true
     :meck.new(HipchatPublisher, [:passthrough])
-    :meck.expect(HipchatPublisher, :send_notification, fn publisher, options -> 
+    :meck.expect(HipchatPublisher, :send_notification, fn publisher, options ->
       assert publisher != nil
       assert options != nil
       notification = options[:room_notification]
@@ -98,7 +100,7 @@ defmodule OpenAperture.Notifications.DispatcherTests do
       assert notification_options[:message] != nil
       assert String.contains?(notification_options[:message], prefix)
 
-      :ok 
+      :ok
     end)
 
     :meck.new(ConnectionPool, [:passthrough])
@@ -109,10 +111,23 @@ defmodule OpenAperture.Notifications.DispatcherTests do
       message: message,
       is_success: true
     }
-    Dispatcher.dispatch_hipchat_notification(payload, %{subscription_handler: %{}, delivery_tag: "123abc"})
+    Dispatcher.send_hipchat_notifications(payload)
   after
     :meck.unload(Room)
     :meck.unload(HipchatPublisher)
     :meck.unload(SubscriptionHandler)
+  end
+
+  test "send_emails() hits Mailman" do
+    :meck.new(Mailer)
+    :meck.expect(Mailer, :deliver, fn _,_,_ -> "Test Email" end)
+
+    assert %{
+      prefix: "[Test]",
+      message: "Test message",
+      notifications: %{email_addresses: ["email"]}
+    } |> Dispatcher.send_emails == "Test Email"
+  after
+    :meck.unload(Mailer)
   end
 end
