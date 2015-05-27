@@ -1,8 +1,8 @@
 # OpenAperture.Notifications
 
 [![Build Status](https://semaphoreci.com/api/v1/projects/ec3d79fd-1837-4ace-975a-b860cfc66a7a/395741/badge.svg)](https://semaphoreci.com/perceptive/notifications--2)
- 
-The Notifications module provides a standardized mechanism to publish events that occur within OpenAperture.  
+
+The Notifications module provides a standardized mechanism to publish events that occur within OpenAperture.
 
 ## Module Responsibilities
 
@@ -12,7 +12,7 @@ The Notifications module is responsible for the following actions within OpenApe
 
 ## Messaging / Communication
 
-The following message(s) may be sent to Notifications.  
+The following message(s) may be sent to Notifications.
 
 * Publish a HipChat Message
   * Queue:  notifications_hipchat
@@ -78,7 +78,7 @@ The following configuration values must be defined either as environment variabl
   * Description: The default room for all HipChat messages
   * Environment Variable:  HIPCHAT_DEFAULT_ROOM_NAME
   * Environment Configuration (.exs): :hipchat, :default_room_name
- 
+
 ## Building & Testing
 
 ### Building
@@ -95,7 +95,7 @@ To startup the application, use mix run:
 MIX_ENV=prod elixir --sname notifications -S mix run --no-halt
 ```
 
-### Testing 
+### Testing
 
 You can then run the tests
 
@@ -112,3 +112,15 @@ MIX_ENV=system mix test test/external/publisher_test.exs --include external:true
 
 MIX_ENV=system mix test test/external/subscriber_test.exs --include external:true
 ```
+
+## Format of expected MQ messages
+
+%{
+  prefix:        "[Some PREFIX]",
+  message:       "Some message",
+  is_success:    true,
+  notifications: %{
+    hipchat_rooms:   ["name", "another_name"],
+    email_addresses: ["mail@hst.com", "another_mail@hst.com"]
+  }
+}
