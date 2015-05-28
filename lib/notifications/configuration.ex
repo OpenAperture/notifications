@@ -45,7 +45,7 @@ defmodule OpenAperture.Notifications.Configuration do
   """ 
   @spec get_current_queue_name() :: String.t()
   def get_current_queue_name do
-    get_config("QUEUE_NAME", :openaperture_overseer, :queue_name)
+    get_config("QUEUE_NAME", :openaperture_notifications, :queue_name)
   end
 
   @doc """
