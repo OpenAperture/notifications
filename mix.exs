@@ -33,13 +33,13 @@ defmodule OpenAperture.Notifications.Mixfile do
       {:timex_extensions, git: "https://github.com/OpenAperture/timex_extensions.git", ref: "ab9d8820625171afbb80ccba1aa48feeb43dd790", override: true},
 
       {:mailman, "~> 0.1.0"},
-      {:eiconv, github: "zotonic/eiconv"},
+      {:eiconv, github: "OpenAperture/eiconv"},
 
       # test dependencies
       {:exvcr,  github: "parroty/exvcr", only: [:test], override: true},
       {:meck,   "0.8.2", only: [:test], override: true},
-      {:ex_doc, github: "elixir-lang/ex_doc", only: [:test], override: true},
-      {:markdown, github: "devinus/markdown", only: [:test]},
+      {:ex_doc, "~> 0.7", only: [:test], override: true},
+      # {:markdown, github: "devinus/markdown", only: [:test]},
     ]
   end
 end
