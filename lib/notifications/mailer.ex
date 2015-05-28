@@ -6,7 +6,7 @@ defmodule OpenAperture.Notifications.Mailer do
   require Logger
   alias   OpenAperture.Notifications.Configuration
 
-  @from "webster@lexmark.com"
+  @from Application.get_env(:mailer, :from)
 
   @doc """
   Proxies to Mailman.deliver\2 and suppying necessary configuration params.
