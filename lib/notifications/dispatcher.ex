@@ -5,7 +5,6 @@ defmodule OpenAperture.Notifications.Dispatcher do
 
   require Logger
   use     GenServer
-  use     OpenAperture.Messaging
 
   alias OpenAperture.Messaging
   alias Messaging.AMQP.QueueBuilder
@@ -23,6 +22,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
   alias OpenAperture.ManagerApi
 
   @connection_options nil
+  use OpenAperture.Messaging
 
   @moduledoc """
   This module contains the logic to dispatch notification messsages to the appropriate GenServer(s)
