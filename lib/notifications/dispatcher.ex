@@ -10,10 +10,11 @@ defmodule OpenAperture.Notifications.Dispatcher do
   alias OpenAperture.Messaging
   alias Messaging.AMQP.QueueBuilder
   alias Messaging.AMQP.SubscriptionHandler
+  alias Messaging.ConnectionOptionsResolver
 
   alias OpenAperture.Notifications
-  alias Notifications.Hipchat.RoomNotification
   alias Notifications.Hipchat.Room
+  alias Notifications.Hipchat.RoomNotification
   alias Notifications.Hipchat.Publisher, as: HipchatPublisher
   alias Notifications.Configuration
   alias Notifications.MessageManager
@@ -58,25 +59,38 @@ defmodule OpenAperture.Notifications.Dispatcher do
   Registers the notification queues with the Messaging system.
   Returns `:ok` or `{:error, reason}`
   """
-  @spec register_queues :: :ok | {:error, String.t()}
+  @spec register_queues :: :ok | {:error, String.t}
   def register_queues do
     Logger.debug("Registering notification queues...")
 
-    api = ManagerApi.get_api
-    notifications_hipchat_queue = QueueBuilder.build(api, Configuration.get_current_queue_name, Configuration.get_current_exchange_id)
-    options = OpenAperture.Messaging.ConnectionOptionsResolver.get_for_broker(api, Configuration.get_current_broker_id)
+    exchange_id = Configuration.get_current_exchange_id
+    broker_id   = Configuration.get_current_broker_id
+    options     = ManagerApi.get_api
+      |> ConnectionOptionsResolver.get_for_broker(broker_id)
 
-    subscribe(options, notifications_hipchat_queue, fn(payload, _meta, %{subscription_handler: subscription_handler, delivery_tag: delivery_tag} = async_info) ->
+    Configuration.queue_name("hipchat") |> register_queue(exchange_id, options)
+    Configuration.queue_name("email")   |> register_queue(exchange_id, options)
+  end
+
+  @doc false
+  @spec register_queue(String.t, String.t, Map) :: :ok | {:error, String.t}
+  defp register_queue(name, exchange_id, options) do
+    queue = ManagerApi.get_api |> QueueBuilder.build(name, exchange_id)
+
+    subscribe(options, queue, fn(payload, _meta, async_info) ->
+      %{subscription_handler: subscription_handler,
+        delivery_tag: delivery_tag} = async_info
+
       try do
         Logger.debug("Starting to process request #{delivery_tag}")
         MessageManager.track(async_info)
         trigger_notifications(payload, async_info)
       catch
         :exit, code   ->
-          Logger.error("Message #{delivery_tag} Exited with code #{inspect code}.  Payload:  #{inspect payload}")
+          Logger.error("Message #{delivery_tag} Exited with code #{inspect code}. Payload: #{inspect payload}")
           SubscriptionHandler.acknowledge(subscription_handler, delivery_tag)
         :throw, value ->
-          Logger.error("Message #{delivery_tag} Throw called with #{inspect value}.  Payload:  #{inspect payload}")
+          Logger.error("Message #{delivery_tag} Throw called with #{inspect value}. Payload: #{inspect payload}")
           SubscriptionHandler.acknowledge(subscription_handler, delivery_tag)
         what, value   ->
           Logger.error("Message #{delivery_tag} Caught #{inspect what} with #{inspect value}.  Payload:  #{inspect payload}")
