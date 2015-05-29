@@ -22,8 +22,8 @@ defmodule OpenAperture.Notifications.Dispatcher do
   alias OpenAperture.ManagerApi
 
   @moduledoc """
-  This module contains the logic to dispatch notification messsages to the appropriate GenServer(s) 
-  """  
+  This module contains the logic to dispatch notification messsages to the appropriate GenServer(s)
+  """
 
   @doc """
   Starts GenServer. Returns `{:ok, pid}` or {:error, reason}``
@@ -99,7 +99,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
   defp send_all_notifications(payload) do
     # TODO make failures independent
     try do
-      # send_hipchat_notifications(payload)
+      send_hipchat_notifications(payload)
       send_emails(payload)
     rescue e ->
       Logger.error("Sending notifications failed: #{inspect e}")
