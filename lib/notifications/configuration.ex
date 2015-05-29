@@ -36,16 +36,20 @@ defmodule OpenAperture.Notifications.Configuration do
 
   @doc """
   Method to retrieve the currently assigned queue name (for "notifications_hipchat")
-   
+
   ## Options
-   
+
   ## Return values
 
   The exchange identifier
-  """ 
-  @spec get_current_queue_name() :: String.t()
-  def get_current_queue_name do
-    get_config("QUEUE_NAME", :openaperture_notifications, :queue_name)
+  """
+  @spec queue_name(String) :: String.t
+  def queue_name(key) do
+    get_config(
+      "#{String.upcase(key)}_QUEUE_NAME",
+      :openaperture_notifications,
+      String.to_atom(key)
+    )
   end
 
   @doc """
