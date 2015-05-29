@@ -102,11 +102,12 @@ defmodule OpenAperture.Notifications.Dispatcher do
   end
 
   @doc """
-  Triggers notifications of all types. Returns `:ok` or `{:error, reason}`.
+  Triggers notifications of a specieifed type.
+  Returns `:ok` or `{:error, reason}`.
   """
   @spec trigger_notifications(String.t, Map, Map) :: :ok | {:error, String.t}
   def trigger_notifications(name, payload, async_info) do
-    case name  do
+    case name do
       "hipchat" -> case send_hipchat_notifications(payload) do
         :ok              -> acknowledge_request(async_info)
         {:error, reason} ->
