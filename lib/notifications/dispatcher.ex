@@ -2,9 +2,9 @@ defmodule OpenAperture.Notifications.Dispatcher do
   @moduledoc """
   Provides dispatching notifications to the appropriate services.
   """
+
   require Logger
   use     GenServer
-  @connection_options nil
   use     OpenAperture.Messaging
 
   alias OpenAperture.Messaging
@@ -21,6 +21,8 @@ defmodule OpenAperture.Notifications.Dispatcher do
   alias Notifications.Mailer
 
   alias OpenAperture.ManagerApi
+
+  @connection_options nil
 
   @moduledoc """
   This module contains the logic to dispatch notification messsages to the appropriate GenServer(s)
@@ -84,7 +86,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
       try do
         Logger.debug("Starting to process request #{delivery_tag}")
         MessageManager.track(async_info)
-        trigger_notifications(payload, async_info)
+        trigger_notifications(name, payload, async_info)
       catch
         :exit, code   ->
           Logger.error("Message #{delivery_tag} Exited with code #{inspect code}. Payload: #{inspect payload}")
@@ -102,22 +104,21 @@ defmodule OpenAperture.Notifications.Dispatcher do
   @doc """
   Triggers notifications of all types. Returns `:ok` or `{:error, reason}`.
   """
-  @spec trigger_notifications(Map, Map) :: :ok | {:error, String.t}
-  def trigger_notifications(payload, async_info) do
-    case send_all_notifications(payload) do
-      :ok              -> acknowledge_request(async_info)
-      {:error, reason} -> reject_request(async_info, reason)
-    end
-  end
-
-  defp send_all_notifications(payload) do
-    # TODO make failures independent
-    try do
-      send_hipchat_notifications(payload)
-      send_emails(payload)
-    rescue e ->
-      Logger.error("Sending notifications failed: #{inspect e}")
-      {:error, inspect(e)}
+  @spec trigger_notifications(String.t, Map, Map) :: :ok | {:error, String.t}
+  def trigger_notifications(name, payload, async_info) do
+    case name  do
+      "hipchat" -> case send_hipchat_notifications(payload) do
+        :ok              -> acknowledge_request(async_info)
+        {:error, reason} ->
+          Logger.error("Sending notifications failed: #{reason}")
+          reject_request(async_info, reason)
+      end
+      "email" -> case send_emails(payload) do
+        :ok              -> acknowledge_request(async_info)
+        {:error, reason} ->
+          Logger.error("Sending notifications failed: #{reason}")
+          reject_request(async_info, reason)
+      end
     end
   end
 
