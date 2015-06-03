@@ -8,9 +8,6 @@ defmodule OpenAperture.Notifications.DispatcherTests do
   alias OpenAperture.Notifications.Hipchat.Publisher, as: HipchatPublisher
   alias OpenAperture.Notifications.Hipchat.RoomNotification
 
-  alias OpenAperture.Messaging.Queue
-  alias OpenAperture.Messaging.ConnectionOptions
-  alias OpenAperture.Messaging.AMQP.ConnectionOptions
   alias OpenAperture.Messaging.AMQP.ConnectionPool
   alias OpenAperture.Messaging.AMQP.ConnectionPools
   alias OpenAperture.Messaging.AMQP.SubscriptionHandler
@@ -104,7 +101,7 @@ defmodule OpenAperture.Notifications.DispatcherTests do
     end)
 
     :meck.new(ConnectionPool, [:passthrough])
-    :meck.expect(ConnectionPool, :subscribe, fn pool, exchange, queue, callback -> :ok end)
+    :meck.expect(ConnectionPool, :subscribe, fn _,_,_,_ -> :ok end)
 
     payload = %{
       prefix: prefix,
@@ -130,4 +127,100 @@ defmodule OpenAperture.Notifications.DispatcherTests do
   after
     :meck.unload(Mailer)
   end
+
+  #================================
+  # trigger_notifications tests
+
+  test "trigger_notifications - unknown" do
+    :meck.new(SubscriptionHandler, [:passthrough])
+    :meck.expect(SubscriptionHandler, :reject, fn _,_,_ -> :ok end)
+
+    Dispatcher.trigger_notifications(:junk, %{}, %{subscription_handler: %{}, delivery_tag: "123abc"})
+  after
+    :meck.unload(SubscriptionHandler)
+  end
+
+  test "trigger_notifications - :email fail" do
+    :meck.new(SubscriptionHandler, [:passthrough])
+    :meck.expect(SubscriptionHandler, :reject, fn _,_,_ -> :ok end)
+
+    :meck.new(Mailer)
+    :meck.expect(Mailer, :deliver, fn _,_,_ -> {:error, "bad news bears"} end)    
+
+    payload = %{
+      prefix: "[Test]",
+      message: "Test message",
+      notifications: %{email_addresses: ["email"]}
+    }
+    Dispatcher.trigger_notifications(:email, payload, %{subscription_handler: %{}, delivery_tag: "123abc"})
+  after
+    :meck.unload(SubscriptionHandler)
+    :meck.unload(Mailer)
+  end
+
+  test "trigger_notifications - :email success" do
+    :meck.new(SubscriptionHandler, [:passthrough])
+    :meck.expect(SubscriptionHandler, :acknowledge, fn _,_ -> :ok end)
+
+    :meck.new(Mailer)
+    :meck.expect(Mailer, :deliver, fn _,_,_ -> :ok end)    
+
+    payload = %{
+      prefix: "[Test]",
+      message: "Test message",
+      notifications: %{email_addresses: ["email"]}
+    }
+    Dispatcher.trigger_notifications(:email, payload, %{subscription_handler: %{}, delivery_tag: "123abc"})
+  after
+    :meck.unload(SubscriptionHandler)
+    :meck.unload(Mailer)
+  end
+
+  test "trigger_notifications - :hipchat fail" do
+    :meck.new(SubscriptionHandler, [:passthrough])
+    :meck.expect(SubscriptionHandler, :acknowledge, fn _, _ -> :ok end)
+    :meck.new(Room, [:passthrough])
+    :meck.expect(Room, :resolve_room_ids, fn _ -> [123] end)
+
+    prefix = "prefix"
+    message = "test message"
+    is_success = true
+    :meck.new(HipchatPublisher, [:passthrough])
+    :meck.expect(HipchatPublisher, :send_notification, fn _,_ -> :ok end)
+
+    payload = %{
+      prefix: prefix,
+      message: message,
+      is_success: true
+    }
+    Dispatcher.trigger_notifications(:hipchat, payload, %{subscription_handler: %{}, delivery_tag: "123abc"})
+  after
+    :meck.unload(SubscriptionHandler)
+    :meck.unload(HipchatPublisher)
+    :meck.unload(Room)
+  end
+
+  test "trigger_notifications - ::hipchat success" do
+    :meck.new(SubscriptionHandler, [:passthrough])
+    :meck.expect(SubscriptionHandler, :acknowledge, fn _, _ -> :ok end)
+    :meck.new(Room, [:passthrough])
+    :meck.expect(Room, :resolve_room_ids, fn _ -> [123] end)
+
+    prefix = "prefix"
+    message = "test message"
+    is_success = true
+    :meck.new(HipchatPublisher, [:passthrough])
+    :meck.expect(HipchatPublisher, :send_notification, fn _,_ -> :ok end)
+
+    payload = %{
+      prefix: prefix,
+      message: message,
+      is_success: true
+    }
+    Dispatcher.trigger_notifications(:hipchat, payload, %{subscription_handler: %{}, delivery_tag: "123abc"})
+  after
+    :meck.unload(SubscriptionHandler)
+    :meck.unload(HipchatPublisher)
+    :meck.unload(Room)
+  end  
 end

@@ -25,9 +25,9 @@ defmodule OpenAperture.Notifications.Mixfile do
   defp deps do
     [
       {:poison, "~> 1.3.1"},
-      {:openaperture_messaging, git: "https://github.com/OpenAperture/messaging.git", ref: "8c51d099ec79473b23b3c385c072e6bf2219fba7", override: true},
-      {:openaperture_manager_api, git: "https://github.com/OpenAperture/manager_api.git", ref: "5d442cfbdd45e71c1101334e185d02baec3ef945", override: true},
-      {:openaperture_overseer_api, git: "https://github.com/OpenAperture/overseer_api.git", ref: "4d65d2295f2730bc74ec695c32fa0d2478158182", override: true},
+      {:openaperture_messaging, git: "https://github.com/OpenAperture/messaging.git", ref: "fa8eb8128176d010d29780251e4ce500068e3ec1", override: true},
+      {:openaperture_manager_api, git: "https://github.com/OpenAperture/manager_api.git", ref: "8e2f6bdbf9f93dcae2540b1313f9d6dfc0a254a6", override: true},
+      {:openaperture_overseer_api, git: "https://github.com/OpenAperture/overseer_api.git", ref: "25c779ea50565cdb3f783cba644294e6238ed72a", override: true},
 
       {:timex, "~> 0.12.9"},
       {:timex_extensions, git: "https://github.com/OpenAperture/timex_extensions.git", ref: "ab9d8820625171afbb80ccba1aa48feeb43dd790", override: true},

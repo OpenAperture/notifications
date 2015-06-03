@@ -70,13 +70,13 @@ defmodule OpenAperture.Notifications.Dispatcher do
     options     = ManagerApi.get_api
       |> ConnectionOptionsResolver.get_for_broker(broker_id)
 
-    Configuration.queue_name("hipchat") |> register_queue(exchange_id, options)
-    Configuration.queue_name("email")   |> register_queue(exchange_id, options)
+    Configuration.queue_name("hipchat") |> register_queue(exchange_id, options, :hipchat)
+    Configuration.queue_name("email")   |> register_queue(exchange_id, options, :email)
   end
 
   @doc false
-  @spec register_queue(String.t, String.t, Map) :: :ok | {:error, String.t}
-  defp register_queue(name, exchange_id, options) do
+  @spec register_queue(String.t, String.t, Map, term) :: :ok | {:error, String.t}
+  defp register_queue(name, exchange_id, options, notification_type) do
     queue = ManagerApi.get_api |> QueueBuilder.build(name, exchange_id)
 
     subscribe(options, queue, fn(payload, _meta, async_info) ->
@@ -86,42 +86,59 @@ defmodule OpenAperture.Notifications.Dispatcher do
       try do
         Logger.debug("Starting to process request #{delivery_tag}")
         MessageManager.track(async_info)
-        trigger_notifications(name, payload, async_info)
+        trigger_notifications(notification_type, payload, async_info)
       catch
         :exit, code   ->
-          Logger.error("Message #{delivery_tag} Exited with code #{inspect code}. Payload: #{inspect payload}")
+          Logger.error("Message #{delivery_tag} (notification type #{inspect notification_type}) Exited with code #{inspect code}. Payload: #{inspect payload}")
           SubscriptionHandler.acknowledge(subscription_handler, delivery_tag)
         :throw, value ->
-          Logger.error("Message #{delivery_tag} Throw called with #{inspect value}. Payload: #{inspect payload}")
+          Logger.error("Message #{delivery_tag} (notification type #{inspect notification_type}) Throw called with #{inspect value}. Payload: #{inspect payload}")
           SubscriptionHandler.acknowledge(subscription_handler, delivery_tag)
         what, value   ->
-          Logger.error("Message #{delivery_tag} Caught #{inspect what} with #{inspect value}.  Payload:  #{inspect payload}")
+          Logger.error("Message #{delivery_tag} (notification type #{inspect notification_type}) Caught #{inspect what} with #{inspect value}.  Payload:  #{inspect payload}")
           SubscriptionHandler.acknowledge(subscription_handler, delivery_tag)
       end
     end)
   end
 
   @doc """
-  Triggers notifications of a specieifed type.
+  Triggers notifications of a specified type.
   Returns `:ok` or `{:error, reason}`.
   """
-  @spec trigger_notifications(String.t, Map, Map) :: :ok | {:error, String.t}
-  def trigger_notifications(name, payload, async_info) do
-    case name do
-      "hipchat" -> case send_hipchat_notifications(payload) do
-        :ok              -> acknowledge_request(async_info)
-        {:error, reason} ->
-          Logger.error("Sending notifications failed: #{reason}")
-          reject_request(async_info, reason)
-      end
-      "email" -> case send_emails(payload) do
-        :ok              -> acknowledge_request(async_info)
-        {:error, reason} ->
-          Logger.error("Sending notifications failed: #{reason}")
-          reject_request(async_info, reason)
-      end
+  @spec trigger_notifications(:hipchat, Map, Map) :: :ok | {:error, String.t}
+  def trigger_notifications(:hipchat, payload, async_info) do
+    case send_hipchat_notifications(payload) do
+      :ok -> acknowledge_request(async_info)
+      {:error, reason} ->
+        Logger.error("Sending notifications failed: #{reason}")
+        reject_request(async_info, reason)
     end
   end
+
+  @doc """
+  Triggers notifications of a specified type.
+  Returns `:ok` or `{:error, reason}`.
+  """
+  @spec trigger_notifications(:email, Map, Map) :: :ok | {:error, String.t}
+  def trigger_notifications(:email, payload, async_info) do
+    case send_emails(payload) do
+      :ok -> acknowledge_request(async_info)
+      {:error, reason} ->
+        Logger.error("Sending notifications failed: #{reason}")
+        reject_request(async_info, reason)
+    end
+  end
+
+  @doc """
+  Triggers notifications of a specified type.
+  Returns `:ok` or `{:error, reason}`.
+  """
+  @spec trigger_notifications(term, Map, Map) :: :ok | {:error, String.t}
+  def trigger_notifications(unknown, _payload, async_info) do
+    reason = "The following notification type is not currently supported:  #{inspect unknown}"
+    Logger.error("Sending notifications failed: #{reason}")
+    reject_request(async_info, reason)
+  end    
 
   @doc false
   @spec acknowledge_request(Map) :: :ok
@@ -135,7 +152,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
   @doc false
   @spec reject_request(Map, String.t()) :: {:error, String.t}
   defp reject_request(async_info, reason) do
-    %{subcription_andler: handler, delivery_tag: tag} = async_info
+    %{subscription_handler: handler, delivery_tag: tag} = async_info
     SubscriptionHandler.reject(handler, tag, false)
     {:error, reason}
   end

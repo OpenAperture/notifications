@@ -4,8 +4,6 @@ defmodule OpenAperture.Notifications.SubscribeTest do
 
   alias OpenAperture.Notifications.Hipchat.Room
   alias OpenAperture.Notifications.Hipchat.AuthToken
-  alias OpenAperture.Notifications.Hipchat.Publisher
-  alias OpenAperture.Notifications.Hipchat.RoomNotification
   alias OpenAperture.Notifications.Dispatcher
 
   test "subscribe" do

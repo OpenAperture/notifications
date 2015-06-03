@@ -4,5 +4,4 @@ erl_crash.dump
 *.ez
 /config/system.exs
 /notes.txt
-/mix.lock
 /*.sublime-project
