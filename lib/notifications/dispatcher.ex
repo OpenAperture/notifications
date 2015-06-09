@@ -122,10 +122,10 @@ defmodule OpenAperture.Notifications.Dispatcher do
   @spec trigger_notifications(:email, Map, Map) :: :ok | {:error, String.t}
   def trigger_notifications(:email, payload, async_info) do
     case send_emails(payload) do
-      :ok -> acknowledge_request(async_info)
       {:error, reason} ->
         Logger.error("Sending notifications failed: #{reason}")
-        reject_request(async_info, reason)
+        reject_request(async_info, reason)      
+      _ -> acknowledge_request(async_info)
     end
   end
 
