@@ -44,10 +44,10 @@ defmodule OpenAperture.Notifications.Supervisor do
 
     children = [
       # Define workers and child supervisors to be supervised
+      worker(OpenAperture.Notifications.MessageManager, []),
       worker(OpenAperture.Notifications.Dispatcher, []),
       worker(OpenAperture.Notifications.Hipchat.AuthToken, []),
-      worker(OpenAperture.Notifications.Hipchat.Room, []),
-      worker(OpenAperture.Notifications.MessageManager, [])
+      worker(OpenAperture.Notifications.Hipchat.Room, [])
     ]
 
     opts = [strategy: :one_for_one, name: __MODULE__]
