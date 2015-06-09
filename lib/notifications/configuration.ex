@@ -79,10 +79,10 @@ defmodule OpenAperture.Notifications.Configuration do
       %Mailman.TestConfig{}
     else
       %Mailman.SmtpConfig{
-        relay: get_config("SMTP_URI", :openaperture_notifications, :smtp_uri),
-        port:  get_config("SMTP_PORT", :openaperture_notifications, :smtp_port),
-        username: get_config("SMTP_USERNAME", :openaperture_notifications, :smtp_username),
-        password: get_config("SMTP_PASSWORD", :openaperture_notifications, :smtp_password),
+        relay: '#{get_config("SMTP_URI", :openaperture_notifications, :smtp_uri)}',
+        port:  '#{get_config("SMTP_PORT", :openaperture_notifications, :smtp_port)}',
+        username: '#{get_config("SMTP_USERNAME", :openaperture_notifications, :smtp_username)}',
+        password: '#{get_config("SMTP_PASSWORD", :openaperture_notifications, :smtp_password)}',
         tls: :always,
         auth: :always
       }
