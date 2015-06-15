@@ -23,12 +23,14 @@ defmodule OpenAperture.Notifications.Mailer do
         from:    from,
         to:      addresses,
         text:    text
-      } |> Mailman.deliver(config) |> Task.await
+      }
+        |> Mailman.deliver(context) 
+        |> Task.await
     end
   end
 
   @doc false
-  defp config do
+  defp context do
     %Mailman.Context{
       config:   Configuration.smtp,
       composer: %Mailman.EexComposeConfig{}
