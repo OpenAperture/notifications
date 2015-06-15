@@ -17,7 +17,7 @@ defmodule OpenAperture.Notifications.Mailer do
       {:error, "No valid email addresses detected"}
     else
       from = Application.get_env(:mailer, :from)
-      Logger.info("Sending email notification(s) to #{inspect addresses} as #{from}...")
+      Logger.info("Sending email notification(s) to #{inspect addresses} as #{from}, context (#{inspect context})...")
       %Mailman.Email{
         subject: subj,
         from:    from,
