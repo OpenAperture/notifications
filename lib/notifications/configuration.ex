@@ -85,7 +85,7 @@ defmodule OpenAperture.Notifications.Configuration do
         password: '#{get_config("SMTP_PASSWORD", :openaperture_notifications, :smtp_password)}',
         tls: :always,
         auth: :always,
-        ssl: true
+        ssl: false
       }
     end
   end
