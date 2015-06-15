@@ -6,8 +6,6 @@ defmodule OpenAperture.Notifications.Mailer do
   require Logger
   alias   OpenAperture.Notifications.Configuration
 
-  @from Application.get_env(:mailer, :from)
-
   @doc """
   Proxies to Mailman.deliver\2 and suppying necessary configuration params.
   """
@@ -18,10 +16,11 @@ defmodule OpenAperture.Notifications.Mailer do
     if Enum.empty? addresses do
       {:error, "No valid email addresses detected"}
     else
-      Logger.info("Sending email notifications to #{inspect addresses}")
+      from = Application.get_env(:mailer, :from)
+      Logger.info("Sending email notification(s) to #{inspect addresses} as #{from}...")
       %Mailman.Email{
         subject: subj,
-        from:    @from ,
+        from:    from,
         to:      addresses,
         text:    text
       } |> Mailman.deliver(config) |> Task.await

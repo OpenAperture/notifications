@@ -125,7 +125,9 @@ defmodule OpenAperture.Notifications.Dispatcher do
       {:error, reason} ->
         Logger.error("Sending notifications failed: #{reason}")
         reject_request(async_info, reason)      
-      _ -> acknowledge_request(async_info)
+      _ -> 
+        Logger.debug("Successfully sent email for request #{async_info[:delivery_tag]}")
+        acknowledge_request(async_info)
     end
   end
 

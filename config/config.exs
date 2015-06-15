@@ -1,6 +1,7 @@
 use Mix.Config
 
-config :mailer, from: "openaperture@lexmark.com"
+config :mailer, 
+	from: System.get_env("SMTP_FROM")
 
 config :openaperture_notifications,
   hipchat: "notifications_hipchat",
