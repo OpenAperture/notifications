@@ -37,7 +37,7 @@ defmodule OpenAperture.Notifications.Mixfile do
 
       # test dependencies
       {:exvcr,  github: "parroty/exvcr", only: [:test], override: true},
-      {:meck,   "~> 0.8.2", only: [:test], override: true},
+      {:meck,   "~> 0.8.3", only: [:test], override: true},
       {:ex_doc, "~> 0.7.3", only: :test, override: true},
       {:earmark, "~> 0.1.17", only: :test},
     ]
