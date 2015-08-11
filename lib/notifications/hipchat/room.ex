@@ -98,9 +98,9 @@ defmodule OpenAperture.Notifications.Hipchat.Room do
       {:ok, {{_,return_code, _}, _, body}} ->
         case return_code do
           200 -> 
-            JSON.decode!(body)["id"]
+            Poison.decode!(body)["id"]
           _   -> 
-            error_body = JSON.decode!(body)
+            error_body = Poison.decode!(body)
             Logger.error("Failed to send hipchat notification to room '#{name}'!  The server responded with #{error_body["status"]} - #{error_body["message"]}")
             nil
         end

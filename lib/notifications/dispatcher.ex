@@ -20,6 +20,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
   alias Notifications.Mailer
 
   alias OpenAperture.ManagerApi
+  alias OpenAperture.ManagerApi.SystemEvent
 
   @connection_options nil
   use OpenAperture.Messaging
@@ -89,13 +90,49 @@ defmodule OpenAperture.Notifications.Dispatcher do
         trigger_notifications(notification_type, payload, async_info)
       catch
         :exit, code   ->
-          Logger.error("Message #{delivery_tag} (notification type #{inspect notification_type}) Exited with code #{inspect code}. Payload: #{inspect payload}")
+          error_msg = "Message #{delivery_tag} (notification type #{inspect notification_type}) Exited with code #{inspect code}. Payload: #{inspect payload}"
+          Logger.error(error_msg)
+          event = %{
+          type: :unhandled_exception, 
+            severity: :error, 
+            data: %{
+              component: :notifications,
+              exchange_id: Configuration.get_current_exchange_id,
+              hostname: System.get_env("HOSTNAME")
+            },
+            message: error_msg
+          }       
+          SystemEvent.create_system_event!(ManagerApi.get_api, event)              
           SubscriptionHandler.acknowledge(subscription_handler, delivery_tag)
         :throw, value ->
-          Logger.error("Message #{delivery_tag} (notification type #{inspect notification_type}) Throw called with #{inspect value}. Payload: #{inspect payload}")
+          error_msg = "Message #{delivery_tag} (notification type #{inspect notification_type}) Throw called with #{inspect value}. Payload: #{inspect payload}"
+          Logger.error(error_msg)
+          event = %{
+          type: :unhandled_exception, 
+            severity: :error, 
+            data: %{
+              component: :notifications,
+              exchange_id: Configuration.get_current_exchange_id,
+              hostname: System.get_env("HOSTNAME")
+            },
+            message: error_msg
+          }       
+          SystemEvent.create_system_event!(ManagerApi.get_api, event)            
           SubscriptionHandler.acknowledge(subscription_handler, delivery_tag)
         what, value   ->
-          Logger.error("Message #{delivery_tag} (notification type #{inspect notification_type}) Caught #{inspect what} with #{inspect value}.  Payload:  #{inspect payload}")
+          error_msg = "Message #{delivery_tag} (notification type #{inspect notification_type}) Caught #{inspect what} with #{inspect value}.  Payload:  #{inspect payload}"
+          Logger.error(error_msg)
+          event = %{
+          type: :unhandled_exception, 
+            severity: :error, 
+            data: %{
+              component: :notifications,
+              exchange_id: Configuration.get_current_exchange_id,
+              hostname: System.get_env("HOSTNAME")
+            },
+            message: error_msg
+          }       
+          SystemEvent.create_system_event!(ManagerApi.get_api, event)            
           SubscriptionHandler.acknowledge(subscription_handler, delivery_tag)
       end
     end)

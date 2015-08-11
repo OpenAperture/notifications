@@ -24,9 +24,9 @@ defmodule OpenAperture.Notifications.Mixfile do
 
   defp deps do
     [
-      {:poison, "~> 1.3.1"},
+      {:poison, "~> 1.4.0", override: true},
       {:openaperture_messaging, git: "https://github.com/OpenAperture/messaging.git", ref: "fa8eb8128176d010d29780251e4ce500068e3ec1", override: true},
-      {:openaperture_manager_api, git: "https://github.com/OpenAperture/manager_api.git", ref: "8e2f6bdbf9f93dcae2540b1313f9d6dfc0a254a6", override: true},
+      {:openaperture_manager_api, git: "https://github.com/OpenAperture/manager_api.git", ref: "ab5334f276b308706a91e85ca27ba937bb02fb9f", override: true},
       {:openaperture_overseer_api, git: "https://github.com/OpenAperture/overseer_api.git", ref: "25c779ea50565cdb3f783cba644294e6238ed72a", override: true},
 
       {:timex, "~> 0.12.9"},

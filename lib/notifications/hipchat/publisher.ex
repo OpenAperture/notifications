@@ -92,7 +92,7 @@ defmodule OpenAperture.Notifications.Hipchat.Publisher do
     Logger.debug("Sending a hipchat room notification to room #{room_notification_options[:room_id]}...")
     resolved_url = 'https://api.hipchat.com/v2/room/#{room_notification_options[:room_id]}/notification?auth_token=#{AuthToken.get_next_token}'
 
-    body = '#{JSON.encode!(room_notification_options)}'
+    body = '#{Poison.encode!(room_notification_options)}'
     case :httpc.request(:post, {resolved_url, [], 'application/json', body}, [], []) do
       {:ok, {{_,return_code, _}, headers, body}} ->
         case return_code do
@@ -120,7 +120,7 @@ defmodule OpenAperture.Notifications.Hipchat.Publisher do
               Logger.error("Error!  Unable to send additinoal hipchats - rate limit has been reached!")
             end
           _   -> 
-            error_body = JSON.decode!("#{body}")
+            error_body = Poison.decode!("#{body}")
             Logger.error("Failed to send hipchat notification!  The server responded with #{error_body["error"]["code"]} - #{error_body["error"]["message"]}")
         end
       {:error, {failure_reason, _}} ->
