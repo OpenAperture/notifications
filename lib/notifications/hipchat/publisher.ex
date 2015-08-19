@@ -113,7 +113,7 @@ defmodule OpenAperture.Notifications.Hipchat.Publisher do
             end
 
             rate_reset_time = OpenAperture.Timex.Extensions.time_from_unix_timestamp(rate_limit_reset)
-            rate_reset_timestamp = OpenAperture.Timex.Extensions.get_elapased_timestamp(rate_reset_time)
+            rate_reset_timestamp = OpenAperture.Timex.Extensions.get_elapsed_timestamp(rate_reset_time)
             Logger.debug("Successfully send hipchat notification.  Rate limit is currently at #{rate_limit_remaining}/#{rate_limit}; next reset in #{rate_reset_timestamp}")
 
             if (rate_limit_remaining <= 0) do

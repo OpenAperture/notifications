@@ -25,12 +25,12 @@ defmodule OpenAperture.Notifications.Mixfile do
   defp deps do
     [
       {:poison, "~> 1.4.0", override: true},
-      {:openaperture_messaging, git: "https://github.com/OpenAperture/messaging.git", ref: "fa8eb8128176d010d29780251e4ce500068e3ec1", override: true},
-      {:openaperture_manager_api, git: "https://github.com/OpenAperture/manager_api.git", ref: "ab5334f276b308706a91e85ca27ba937bb02fb9f", override: true},
-      {:openaperture_overseer_api, git: "https://github.com/OpenAperture/overseer_api.git", ref: "25c779ea50565cdb3f783cba644294e6238ed72a", override: true},
+      {:openaperture_messaging, git: "https://github.com/OpenAperture/messaging.git", ref: "3d3a84eabf4ba0a3a827a61c4d99cdbf0ab49a0d", override: true},
+      {:openaperture_manager_api, git: "https://github.com/OpenAperture/manager_api.git", ref: "86cf2c324434f9899416881219e03c0f959c2896", override: true},
+      {:openaperture_overseer_api, git: "https://github.com/OpenAperture/overseer_api.git", ref: "4b9146507ab50789fec4696b96f79642add2b502", override: true},
 
-      {:timex, "~> 0.12.9"},
-      {:timex_extensions, git: "https://github.com/OpenAperture/timex_extensions.git", ref: "ab9d8820625171afbb80ccba1aa48feeb43dd790", override: true},
+      {:timex, "~> 0.13.3", override: true},
+      {:timex_extensions, git: "https://github.com/OpenAperture/timex_extensions.git", ref: "1665c1df90397702daf492c6f940e644085016cd", override: true},
 
       {:mailman, "~> 0.1.0"},
       {:eiconv, github: "OpenAperture/eiconv"},
