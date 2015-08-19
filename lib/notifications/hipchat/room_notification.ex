@@ -33,7 +33,7 @@ defmodule OpenAperture.Notifications.Hipchat.RoomNotification do
   or `:ignore`, the process is terminated and the function returns
   `{:error, reason}` or `:ignore`, respectively.
   """
-  @spec create(Map) :: {:ok, pid} | {:error, String.t()}
+  @spec create(Map) :: {:ok, pid} | {:error, String.t}
   def create(options) do
     resolved_options = Map.merge(options, %{notification_type: :room_notification})
     if (resolved_options[:color] == nil) do

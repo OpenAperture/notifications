@@ -32,7 +32,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
   @doc """
   Starts GenServer. Returns `{:ok, pid}` or {:error, reason}``
   """
-  @spec start_link() :: {:ok, pid} | {:error, String.t()}
+  @spec start_link() :: {:ok, pid} | {:error, String.t}
   def start_link do
     case GenServer.start_link(__MODULE__, %{}, name: __MODULE__) do
       {:error, reason} ->
@@ -192,7 +192,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
   end
 
   @doc false
-  @spec reject_request(Map, String.t()) :: {:error, String.t}
+  @spec reject_request(Map, String.t) :: {:error, String.t}
   defp reject_request(async_info, reason) do
     %{subscription_handler: handler, delivery_tag: tag} = async_info
     SubscriptionHandler.reject(handler, tag, false)
@@ -213,7 +213,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
   Delivers payload to the HipChat publisher.
   Returns `:ok` or `{:error, reason}`.
   """
-  @spec send_hipchat_notifications(Map) :: :ok | {:error, String.t()}
+  @spec send_hipchat_notifications(Map) :: :ok | {:error, String.t}
   def send_hipchat_notifications(payload) do
     # NOTE: Until there's a strong usecase for requiring requeue of failed HC messages,
     # simply ack/reject here rather than tracking the delivery tags separately.

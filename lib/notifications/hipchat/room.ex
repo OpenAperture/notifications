@@ -35,7 +35,7 @@ defmodule OpenAperture.Notifications.Hipchat.Room do
   or `:ignore`, the process is terminated and the function returns
   `{:error, reason}` or `:ignore`, respectively.
   """
-  @spec start_link() :: {:ok, pid} | {:error, String.t()}
+  @spec start_link() :: {:ok, pid} | {:error, String.t}
   def start_link() do
     Agent.start_link(fn -> %{} end, name: __MODULE__)
   end
