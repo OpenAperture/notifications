@@ -60,7 +60,7 @@ defmodule OpenAperture.Notifications.Hipchat.Publisher do
 
   :ok | {:error, reason}
   """
-  @spec send_notification(pid, Map) :: :ok | {:error, String.t}
+  @spec send_notification(pid, map) :: :ok | {:error, String.t}
   def send_notification(publisher, options) do
     if options[:room_notification] do
       GenServer.cast(publisher, {:room_notification, options})
