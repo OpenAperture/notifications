@@ -9,7 +9,7 @@ defmodule OpenAperture.Notifications.Mailer do
   @doc """
   Proxies to Mailman.deliver\2 and suppying necessary configuration params.
   """
-  @spec deliver(List, String.t, String.t) :: {:ok, String.t} | {:error, String.t}
+  @spec deliver(list, String.t, String.t) :: {:ok, String.t} | {:error, String.t}
   def deliver(addresses, subj, text) do
     addresses = validate_email(addresses)
 

@@ -52,7 +52,7 @@ defmodule OpenAperture.Notifications.Hipchat.Room do
   A list of room IDs
 
   """
-  @spec resolve_room_ids(List) :: List
+  @spec resolve_room_ids(list) :: list
   def resolve_room_ids(room_names) do
     if (room_names == nil || length(room_names) == 0) do
       []

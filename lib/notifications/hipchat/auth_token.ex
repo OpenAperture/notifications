@@ -102,7 +102,7 @@ defmodule OpenAperture.Notifications.Hipchat.AuthToken do
 
   :ok
   """
-  @spec update(List) :: :ok
+  @spec update(list) :: :ok
   def update(new_hosts) do
   	Agent.update(__MODULE__, fn _ -> new_hosts end)
   end
