@@ -9,7 +9,7 @@ require Timex.Date
 require Timex.Time
 
 defmodule OpenAperture.Notifications.Hipchat.Publisher do
-  
+
   @moduledoc """
   This module contains the server for managing/handling HipChat notifications
   """
@@ -96,16 +96,16 @@ defmodule OpenAperture.Notifications.Hipchat.Publisher do
     case :httpc.request(:post, {resolved_url, [], 'application/json', body}, [], []) do
       {:ok, {{_,return_code, _}, headers, body}} ->
         case return_code do
-          204 -> 
+          204 ->
             {rate_limit, rate_limit_remaining, rate_limit_reset} = Enum.reduce headers, {nil, nil, nil}, fn (header, {rate_limit, rate_limit_remaining, rate_limit_reset}) ->
-              cond do 
-                elem(header, 0) == 'x-ratelimit-limit' || elem(header, 0) == 'X-Ratelimit-Limit' -> 
+              cond do
+                elem(header, 0) == 'x-ratelimit-limit' || elem(header, 0) == 'X-Ratelimit-Limit' ->
                   {val, _} = Integer.parse("#{elem(header, 1)}")
                   {val, rate_limit_remaining, rate_limit_reset}
-                elem(header, 0) == 'x-ratelimit-remaining' || elem(header, 0) == 'X-Ratelimit-Remaining' -> 
+                elem(header, 0) == 'x-ratelimit-remaining' || elem(header, 0) == 'X-Ratelimit-Remaining' ->
                   {val, _} = Integer.parse("#{elem(header, 1)}")
                   {rate_limit, val, rate_limit_reset}
-                elem(header, 0) == 'x-ratelimit-reset' || elem(header, 0) == 'X-Ratelimit-Reset' -> 
+                elem(header, 0) == 'x-ratelimit-reset' || elem(header, 0) == 'X-Ratelimit-Reset' ->
                   {val, _} = Integer.parse("#{elem(header, 1)}")
                   {rate_limit, rate_limit_remaining, val}
                 true -> {rate_limit, rate_limit_remaining, rate_limit_reset}
@@ -119,7 +119,7 @@ defmodule OpenAperture.Notifications.Hipchat.Publisher do
             if (rate_limit_remaining <= 0) do
               Logger.error("Error!  Unable to send additinoal hipchats - rate limit has been reached!")
             end
-          _   -> 
+          _   ->
             error_body = Poison.decode!("#{body}")
             Logger.error("Failed to send hipchat notification!  The server responded with #{error_body["error"]["code"]} - #{error_body["error"]["message"]}")
         end

@@ -24,7 +24,7 @@ defmodule OpenAperture.Notifications.Mailer do
         to:      addresses,
         text:    text
       }
-        |> Mailman.deliver(context) 
+        |> Mailman.deliver(context)
         |> Task.await
     end
   end

@@ -10,7 +10,7 @@ defmodule OpenAperture.Notifications do
 
   @moduledoc """
   This module contains definition the OpenAperture Notifications implementation
-  """  
+  """
 
   @doc """
   Starts the given `_type`.

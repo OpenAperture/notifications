@@ -97,9 +97,9 @@ defmodule OpenAperture.Notifications.Hipchat.Room do
     case :httpc.request(:get, {'https://api.hipchat.com/v2/room/#{URI.encode(name)}?auth_token=#{AuthToken.get_next_token}', []}, [], []) do
       {:ok, {{_,return_code, _}, _, body}} ->
         case return_code do
-          200 -> 
+          200 ->
             Poison.decode!(body)["id"]
-          _   -> 
+          _   ->
             error_body = Poison.decode!(body)
             Logger.error("Failed to send hipchat notification to room '#{name}'!  The server responded with #{error_body["status"]} - #{error_body["message"]}")
             nil

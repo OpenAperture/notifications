@@ -94,48 +94,48 @@ defmodule OpenAperture.Notifications.Dispatcher do
           Logger.error(error_msg)
           event = %{
             unique: true,
-            type: :unhandled_exception, 
-            severity: :error, 
+            type: :unhandled_exception,
+            severity: :error,
             data: %{
               component: :notifications,
               exchange_id: Configuration.get_current_exchange_id,
               hostname: System.get_env("HOSTNAME")
             },
             message: error_msg
-          }       
-          SystemEvent.create_system_event!(ManagerApi.get_api, event)              
+          }
+          SystemEvent.create_system_event!(ManagerApi.get_api, event)
           SubscriptionHandler.acknowledge(subscription_handler, delivery_tag)
         :throw, value ->
           error_msg = "Message #{delivery_tag} (notification type #{inspect notification_type}) Throw called with #{inspect value}. Payload: #{inspect payload}"
           Logger.error(error_msg)
           event = %{
             unique: true,
-            type: :unhandled_exception, 
-            severity: :error, 
+            type: :unhandled_exception,
+            severity: :error,
             data: %{
               component: :notifications,
               exchange_id: Configuration.get_current_exchange_id,
               hostname: System.get_env("HOSTNAME")
             },
             message: error_msg
-          }       
-          SystemEvent.create_system_event!(ManagerApi.get_api, event)            
+          }
+          SystemEvent.create_system_event!(ManagerApi.get_api, event)
           SubscriptionHandler.acknowledge(subscription_handler, delivery_tag)
         what, value   ->
           error_msg = "Message #{delivery_tag} (notification type #{inspect notification_type}) Caught #{inspect what} with #{inspect value}.  Payload:  #{inspect payload}"
           Logger.error(error_msg)
           event = %{
             unique: true,
-            type: :unhandled_exception, 
-            severity: :error, 
+            type: :unhandled_exception,
+            severity: :error,
             data: %{
               component: :notifications,
               exchange_id: Configuration.get_current_exchange_id,
               hostname: System.get_env("HOSTNAME")
             },
             message: error_msg
-          }       
-          SystemEvent.create_system_event!(ManagerApi.get_api, event)            
+          }
+          SystemEvent.create_system_event!(ManagerApi.get_api, event)
           SubscriptionHandler.acknowledge(subscription_handler, delivery_tag)
       end
     end)
@@ -164,8 +164,8 @@ defmodule OpenAperture.Notifications.Dispatcher do
     case send_emails(payload) do
       {:error, reason} ->
         Logger.error("Sending notifications failed: #{reason}")
-        reject_request(async_info, reason)      
-      _ -> 
+        reject_request(async_info, reason)
+      _ ->
         Logger.debug("Successfully sent email for request #{async_info[:delivery_tag]}")
         acknowledge_request(async_info)
     end
@@ -180,7 +180,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
     reason = "The following notification type is not currently supported:  #{inspect unknown}"
     Logger.error("Sending notifications failed: #{reason}")
     reject_request(async_info, reason)
-  end    
+  end
 
   @doc false
   @spec acknowledge_request(Map) :: :ok

@@ -21,7 +21,7 @@ defmodule OpenAperture.Notifications.MessageManager do
   """
   @spec start_link() :: {:ok, pid} | {:error, String.t()}
   def start_link() do
-    Logger.debug("#{@logprefix} Starting...")      
+    Logger.debug("#{@logprefix} Starting...")
     Agent.start_link(fn -> %{} end, name: __MODULE__)
   end
 
@@ -36,16 +36,16 @@ defmodule OpenAperture.Notifications.MessageManager do
   """
   @spec track(Map) :: term
   def track(%{subscription_handler: subscription_handler, delivery_tag: delivery_tag} = _async_info) do
-    Logger.debug("#{@logprefix} Tracking message #{delivery_tag}...")    
+    Logger.debug("#{@logprefix} Tracking message #{delivery_tag}...")
     new_message = %{
       process: self(),
-      subscription_handler: subscription_handler, 
+      subscription_handler: subscription_handler,
       delivery_tag: delivery_tag,
       start_time: :calendar.universal_time
     }
 
     Agent.update(__MODULE__, fn messages -> Map.put(messages, delivery_tag, new_message) end)
-    
+
     new_message
   end
 
