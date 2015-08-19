@@ -35,11 +35,11 @@ defmodule OpenAperture.Notifications.Hipchat.AuthToken do
   or `:ignore`, the process is terminated and the function returns
   `{:error, reason}` or `:ignore`, respectively.
   """
-  @spec start_link() :: {:ok, pid} | {:error, String.t()}
+  @spec start_link() :: {:ok, pid} | {:error, String.t}
   def start_link() do
     create()
   end
-  
+
   @doc """
   This module contains the hipchat auth token logic
 
@@ -55,7 +55,7 @@ defmodule OpenAperture.Notifications.Hipchat.AuthToken do
   or `:ignore`, the process is terminated and the function returns
   `{:error, reason}` or `:ignore`, respectively.
   """
-  @spec create() :: {:ok, pid} | {:error, String.t()}	
+  @spec create() :: {:ok, pid} | {:error, String.t}
   def create() do
   	token_string = Configuration.get_hipchat_config("HIPCHAT_AUTH_TOKENS", :auth_tokens)
   	if token_string == nil || String.length(token_string) == 0 do
@@ -83,7 +83,7 @@ defmodule OpenAperture.Notifications.Hipchat.AuthToken do
   or `:ignore`, the process is terminated and the function returns
   `{:error, reason}` or `:ignore`, respectively.
   """
-  @spec create() :: {:ok, pid} | {:error, String.t()} 
+  @spec create() :: {:ok, pid} | {:error, String.t}
   def create!() do
     case create() do
       {:ok, pid} -> pid
@@ -102,7 +102,7 @@ defmodule OpenAperture.Notifications.Hipchat.AuthToken do
 
   :ok
   """
-  @spec update(List) :: :ok
+  @spec update(list) :: :ok
   def update(new_hosts) do
   	Agent.update(__MODULE__, fn _ -> new_hosts end)
   end
@@ -129,7 +129,7 @@ defmodule OpenAperture.Notifications.Hipchat.AuthToken do
 
   String
   """
-  @spec get_next_token() :: String.t()
+  @spec get_next_token() :: String.t
   def get_next_token() do
     tokens = Agent.get(__MODULE__, fn hosts -> hosts end)
 

@@ -32,7 +32,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
   @doc """
   Starts GenServer. Returns `{:ok, pid}` or {:error, reason}``
   """
-  @spec start_link() :: {:ok, pid} | {:error, String.t()}
+  @spec start_link() :: {:ok, pid} | {:error, String.t}
   def start_link do
     case GenServer.start_link(__MODULE__, %{}, name: __MODULE__) do
       {:error, reason} ->
@@ -76,7 +76,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
   end
 
   @doc false
-  @spec register_queue(String.t, String.t, Map, term) :: :ok | {:error, String.t}
+  @spec register_queue(String.t, String.t, map, term) :: :ok | {:error, String.t}
   defp register_queue(name, exchange_id, options, notification_type) do
     queue = ManagerApi.get_api |> QueueBuilder.build(name, exchange_id)
 
@@ -94,48 +94,48 @@ defmodule OpenAperture.Notifications.Dispatcher do
           Logger.error(error_msg)
           event = %{
             unique: true,
-            type: :unhandled_exception, 
-            severity: :error, 
+            type: :unhandled_exception,
+            severity: :error,
             data: %{
               component: :notifications,
               exchange_id: Configuration.get_current_exchange_id,
               hostname: System.get_env("HOSTNAME")
             },
             message: error_msg
-          }       
-          SystemEvent.create_system_event!(ManagerApi.get_api, event)              
+          }
+          SystemEvent.create_system_event!(ManagerApi.get_api, event)
           SubscriptionHandler.acknowledge(subscription_handler, delivery_tag)
         :throw, value ->
           error_msg = "Message #{delivery_tag} (notification type #{inspect notification_type}) Throw called with #{inspect value}. Payload: #{inspect payload}"
           Logger.error(error_msg)
           event = %{
             unique: true,
-            type: :unhandled_exception, 
-            severity: :error, 
+            type: :unhandled_exception,
+            severity: :error,
             data: %{
               component: :notifications,
               exchange_id: Configuration.get_current_exchange_id,
               hostname: System.get_env("HOSTNAME")
             },
             message: error_msg
-          }       
-          SystemEvent.create_system_event!(ManagerApi.get_api, event)            
+          }
+          SystemEvent.create_system_event!(ManagerApi.get_api, event)
           SubscriptionHandler.acknowledge(subscription_handler, delivery_tag)
         what, value   ->
           error_msg = "Message #{delivery_tag} (notification type #{inspect notification_type}) Caught #{inspect what} with #{inspect value}.  Payload:  #{inspect payload}"
           Logger.error(error_msg)
           event = %{
             unique: true,
-            type: :unhandled_exception, 
-            severity: :error, 
+            type: :unhandled_exception,
+            severity: :error,
             data: %{
               component: :notifications,
               exchange_id: Configuration.get_current_exchange_id,
               hostname: System.get_env("HOSTNAME")
             },
             message: error_msg
-          }       
-          SystemEvent.create_system_event!(ManagerApi.get_api, event)            
+          }
+          SystemEvent.create_system_event!(ManagerApi.get_api, event)
           SubscriptionHandler.acknowledge(subscription_handler, delivery_tag)
       end
     end)
@@ -145,7 +145,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
   Triggers notifications of a specified type.
   Returns `:ok` or `{:error, reason}`.
   """
-  @spec trigger_notifications(:hipchat, Map, Map) :: :ok | {:error, String.t}
+  @spec trigger_notifications(:hipchat, map, map) :: :ok | {:error, String.t}
   def trigger_notifications(:hipchat, payload, async_info) do
     case send_hipchat_notifications(payload) do
       :ok -> acknowledge_request(async_info)
@@ -159,13 +159,13 @@ defmodule OpenAperture.Notifications.Dispatcher do
   Triggers notifications of a specified type.
   Returns `:ok` or `{:error, reason}`.
   """
-  @spec trigger_notifications(:email, Map, Map) :: :ok | {:error, String.t}
+  @spec trigger_notifications(:email, map, map) :: :ok | {:error, String.t}
   def trigger_notifications(:email, payload, async_info) do
     case send_emails(payload) do
       {:error, reason} ->
         Logger.error("Sending notifications failed: #{reason}")
-        reject_request(async_info, reason)      
-      _ -> 
+        reject_request(async_info, reason)
+      _ ->
         Logger.debug("Successfully sent email for request #{async_info[:delivery_tag]}")
         acknowledge_request(async_info)
     end
@@ -175,15 +175,15 @@ defmodule OpenAperture.Notifications.Dispatcher do
   Triggers notifications of a specified type.
   Returns `:ok` or `{:error, reason}`.
   """
-  @spec trigger_notifications(term, Map, Map) :: :ok | {:error, String.t}
+  @spec trigger_notifications(term, map, map) :: :ok | {:error, String.t}
   def trigger_notifications(unknown, _payload, async_info) do
     reason = "The following notification type is not currently supported:  #{inspect unknown}"
     Logger.error("Sending notifications failed: #{reason}")
     reject_request(async_info, reason)
-  end    
+  end
 
   @doc false
-  @spec acknowledge_request(Map) :: :ok
+  @spec acknowledge_request(map) :: :ok
   defp acknowledge_request(async_info) do
     %{subscription_handler: handler, delivery_tag: tag} = async_info
     SubscriptionHandler.acknowledge(handler, tag)
@@ -192,7 +192,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
   end
 
   @doc false
-  @spec reject_request(Map, String.t()) :: {:error, String.t}
+  @spec reject_request(map, String.t) :: {:error, String.t}
   defp reject_request(async_info, reason) do
     %{subscription_handler: handler, delivery_tag: tag} = async_info
     SubscriptionHandler.reject(handler, tag, false)
@@ -203,7 +203,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
   Sends email notififcations.
   Returns `{:ok, msg}` or `{:error, reason}`.
   """
-  @spec send_emails(Map) :: {:ok, String.t} | {:error, String.t}
+  @spec send_emails(map) :: {:ok, String.t} | {:error, String.t}
   def send_emails(payload) when is_map(payload) do
     %{prefix: subj, message: text, notifications: %{email_addresses: to}} = payload
     Mailer.deliver(to, subj, text)
@@ -213,7 +213,7 @@ defmodule OpenAperture.Notifications.Dispatcher do
   Delivers payload to the HipChat publisher.
   Returns `:ok` or `{:error, reason}`.
   """
-  @spec send_hipchat_notifications(Map) :: :ok | {:error, String.t()}
+  @spec send_hipchat_notifications(map) :: :ok | {:error, String.t}
   def send_hipchat_notifications(payload) do
     # NOTE: Until there's a strong usecase for requiring requeue of failed HC messages,
     # simply ack/reject here rather than tracking the delivery tags separately.

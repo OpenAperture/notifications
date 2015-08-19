@@ -35,7 +35,7 @@ defmodule OpenAperture.Notifications.Hipchat.Room do
   or `:ignore`, the process is terminated and the function returns
   `{:error, reason}` or `:ignore`, respectively.
   """
-  @spec start_link() :: {:ok, pid} | {:error, String.t()}
+  @spec start_link() :: {:ok, pid} | {:error, String.t}
   def start_link() do
     Agent.start_link(fn -> %{} end, name: __MODULE__)
   end
@@ -52,7 +52,7 @@ defmodule OpenAperture.Notifications.Hipchat.Room do
   A list of room IDs
 
   """
-  @spec resolve_room_ids(List) :: List
+  @spec resolve_room_ids(list) :: list
   def resolve_room_ids(room_names) do
     if (room_names == nil || length(room_names) == 0) do
       []
@@ -97,9 +97,9 @@ defmodule OpenAperture.Notifications.Hipchat.Room do
     case :httpc.request(:get, {'https://api.hipchat.com/v2/room/#{URI.encode(name)}?auth_token=#{AuthToken.get_next_token}', []}, [], []) do
       {:ok, {{_,return_code, _}, _, body}} ->
         case return_code do
-          200 -> 
+          200 ->
             Poison.decode!(body)["id"]
-          _   -> 
+          _   ->
             error_body = Poison.decode!(body)
             Logger.error("Failed to send hipchat notification to room '#{name}'!  The server responded with #{error_body["status"]} - #{error_body["message"]}")
             nil

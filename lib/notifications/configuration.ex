@@ -13,7 +13,7 @@ defmodule OpenAperture.Notifications.Configuration do
 
   The exchange identifier
   """
-  @spec get_current_exchange_id() :: String.t()
+  @spec get_current_exchange_id() :: String.t
   def get_current_exchange_id do
     System.get_env()
     get_config("EXCHANGE_ID", :openaperture_notifications, :exchange_id)
@@ -28,7 +28,7 @@ defmodule OpenAperture.Notifications.Configuration do
 
   The exchange identifier
   """
-  @spec get_current_broker_id() :: String.t()
+  @spec get_current_broker_id() :: String.t
   def get_current_broker_id do
     System.get_env()
     get_config("BROKER_ID", :openaperture_notifications, :broker_id)
@@ -65,7 +65,7 @@ defmodule OpenAperture.Notifications.Configuration do
 
   Value
   """
-  @spec get_hipchat_config(String.t(), term) :: String.t()
+  @spec get_hipchat_config(String.t, term) :: String.t
   def get_hipchat_config(env_name, config_name) do
     get_config(env_name, :hipchat, config_name)
   end
@@ -105,7 +105,7 @@ defmodule OpenAperture.Notifications.Configuration do
   #
   # Value
   #
-  @spec get_config(String.t(), term, term) :: String.t()
+  @spec get_config(String.t, term, term) :: String.t
   defp get_config(env_name, application_config, config_name) do
     System.get_env(env_name) || Application.get_env(application_config, config_name)
   end
