@@ -4,6 +4,10 @@
 
 The Notifications module provides a standardized mechanism to publish events that occur within OpenAperture.
 
+## Contributing
+
+To contribute to OpenAperture development, view our [contributing guide](http://openaperture.io/dev_resources/contributing.html)
+
 ## Module Responsibilities
 
 The Notifications module is responsible for the following actions within OpenAperture:
