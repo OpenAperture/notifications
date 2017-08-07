@@ -1,5 +1,5 @@
 # OpenAperture.Notifications
-
+ 
 [![Build Status](https://semaphoreci.com/api/v1/projects/ec3d79fd-1837-4ace-975a-b860cfc66a7a/395741/badge.svg)](https://semaphoreci.com/perceptive/notifications--2)
 
 The Notifications module provides a standardized mechanism to publish events that occur within OpenAperture.
